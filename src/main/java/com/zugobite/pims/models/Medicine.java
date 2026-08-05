@@ -3,6 +3,16 @@ package com.zugobite.pims.models;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * A single inventory item — maps 1:1 to a row in the `medicines` table. This is the core
+ * domain object the whole app revolves around: Admin does CRUD on it directly (Manage
+ * Medicines tab), Cashier reads its price/stock during checkout (POS + Stock Check), and
+ * every report either aggregates or filters on its fields.
+ *
+ * <p>{@code price} is a {@link BigDecimal} rather than {@code double} to avoid floating-point
+ * rounding errors on money — the same reason the `price` and `price_at_sale` columns in
+ * {@code database.sql} are {@code DECIMAL(10,2)} rather than {@code FLOAT}.</p>
+ */
 public class Medicine {
 
     private int medicineId;
@@ -28,6 +38,12 @@ public class Medicine {
         this.supplierId = supplierId;
     }
 
+    /**
+     * Mirrors the condition used by {@link com.zugobite.pims.services.ReportService#getLowStockReport()}
+     * (`quantity_in_stock <= reorder_level`). Kept here too as a convenience for any future
+     * UI that wants to flag a single medicine (e.g. highlighting a low-stock row red in a
+     * table) without running a separate report query.
+     */
     public boolean isLowStock() {
         return quantityInStock <= reorderLevel;
     }
@@ -100,6 +116,10 @@ public class Medicine {
         this.supplierId = supplierId;
     }
 
+    /**
+     * Used by Swing components (e.g. any future {@link javax.swing.JComboBox} of medicines)
+     * to render this object as just its name instead of the default {@code Object.toString()}.
+     */
     @Override
     public String toString() {
         return name;

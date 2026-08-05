@@ -8,6 +8,12 @@ import com.zugobite.pims.services.UserService;
 
 import javax.swing.*;
 
+/**
+ * The Admin's main window: a tabbed shell around the four screens PLAN.md §5.3 requires —
+ * Manage Medicines, Manage Suppliers, Manage Users, and Reports. This class itself contains
+ * no business logic; it only assembles the tabs and hands each one the specific service(s)
+ * it needs, all supplied by {@link com.zugobite.pims.controllers.AdminController}.
+ */
 public class AdminDashboardView extends JFrame {
 
     public AdminDashboardView(User admin, MedicineService medicineService, SupplierService supplierService,
@@ -18,7 +24,9 @@ public class AdminDashboardView extends JFrame {
         setLocationRelativeTo(null);
 
         JTabbedPane tabs = new JTabbedPane();
-        tabs.addTab("Manage Medicines", new ManageMedicinesPanel(medicineService));
+        // ManageMedicinesPanel needs SupplierService too, purely to populate the supplier
+        // dropdown in its Add/Edit dialog — it never writes to the suppliers table itself.
+        tabs.addTab("Manage Medicines", new ManageMedicinesPanel(medicineService, supplierService));
         tabs.addTab("Manage Suppliers", new ManageSuppliersPanel(supplierService));
         tabs.addTab("Manage Users", new ManageUsersPanel(userService));
         tabs.addTab("Reports", new ReportsPanel(reportService));

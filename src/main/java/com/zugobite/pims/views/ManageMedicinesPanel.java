@@ -1,18 +1,34 @@
 package com.zugobite.pims.views;
 
 import com.zugobite.pims.models.Medicine;
+import com.zugobite.pims.models.Supplier;
 import com.zugobite.pims.services.MedicineService;
+import com.zugobite.pims.services.SupplierService;
 import com.zugobite.pims.utils.UIUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
+/**
+ * Admin tab for full CRUD on {@link Medicine} records, including the expiry date and
+ * supplier link (PLAN.md §5.3 "Manage Medicines tab").
+ *
+ * <p>Needs {@link SupplierService} in addition to {@link MedicineService} purely so the
+ * "Add"/"Edit" dialog can offer a dropdown of valid suppliers — this panel never writes to
+ * the `suppliers` table itself.</p>
+ */
 public class ManageMedicinesPanel extends JPanel {
 
     private final MedicineService medicineService;
+    private final SupplierService supplierService;
+
+    // Column order here must match the order values are appended in loadMedicines() below.
     private final DefaultTableModel tableModel = new DefaultTableModel(
             new Object[]{"ID", "Name", "Company", "Type", "Price", "Stock", "Reorder", "Expiry", "Supplier ID"}, 0
     ) {
@@ -23,8 +39,9 @@ public class ManageMedicinesPanel extends JPanel {
     };
     private final JTable table = new JTable(tableModel);
 
-    public ManageMedicinesPanel(MedicineService medicineService) {
+    public ManageMedicinesPanel(MedicineService medicineService, SupplierService supplierService) {
         this.medicineService = medicineService;
+        this.supplierService = supplierService;
         setLayout(new BorderLayout(8, 8));
         UIUtils.applyStandardPadding(this);
 
@@ -35,7 +52,12 @@ public class ManageMedicinesPanel extends JPanel {
         JButton addButton = new JButton("Add");
         JButton editButton = new JButton("Edit");
         JButton deleteButton = new JButton("Delete");
+
         refreshButton.addActionListener(e -> loadMedicines());
+        addButton.addActionListener(e -> openAddDialog());
+        editButton.addActionListener(e -> openEditDialog());
+        deleteButton.addActionListener(e -> deleteSelected());
+
         buttons.add(refreshButton);
         buttons.add(addButton);
         buttons.add(editButton);
@@ -45,6 +67,7 @@ public class ManageMedicinesPanel extends JPanel {
         loadMedicines();
     }
 
+    /** Re-queries every medicine from the database and repopulates the table from scratch. */
     public void loadMedicines() {
         try {
             List<Medicine> medicines = medicineService.getAllMedicines();
@@ -58,5 +81,126 @@ public class ManageMedicinesPanel extends JPanel {
         } catch (SQLException e) {
             UIUtils.showError(this, "Failed to load medicines: " + e.getMessage());
         }
+    }
+
+    /**
+     * Loads the current supplier list and opens a blank {@link MedicineFormDialog}. Requires
+     * at least one supplier to exist, since a medicine can't be saved without a supplier_id.
+     */
+    private void openAddDialog() {
+        List<Supplier> suppliers = fetchSuppliersOrShowError();
+        if (suppliers == null) {
+            return;
+        }
+        if (suppliers.isEmpty()) {
+            UIUtils.showError(this, "Add at least one supplier before adding medicines.");
+            return;
+        }
+
+        MedicineFormDialog dialog = new MedicineFormDialog(ownerFrame(), null, suppliers);
+        dialog.setVisible(true);
+
+        Optional<Medicine> newMedicine = dialog.getResult();
+        if (newMedicine.isEmpty()) {
+            return;
+        }
+
+        try {
+            medicineService.addMedicine(newMedicine.get());
+            loadMedicines();
+        } catch (SQLException e) {
+            UIUtils.showError(this, "Failed to add medicine: " + e.getMessage());
+        }
+    }
+
+    /** Opens {@link MedicineFormDialog} pre-filled with the selected row; on confirmation, updates it. */
+    private void openEditDialog() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            UIUtils.showError(this, "Select a medicine to edit.");
+            return;
+        }
+
+        List<Supplier> suppliers = fetchSuppliersOrShowError();
+        if (suppliers == null) {
+            return;
+        }
+
+        Medicine existing = medicineFromRow(row);
+        MedicineFormDialog dialog = new MedicineFormDialog(ownerFrame(), existing, suppliers);
+        dialog.setVisible(true);
+
+        Optional<Medicine> updated = dialog.getResult();
+        if (updated.isEmpty()) {
+            return;
+        }
+
+        try {
+            medicineService.updateMedicine(updated.get());
+            loadMedicines();
+        } catch (SQLException e) {
+            UIUtils.showError(this, "Failed to update medicine: " + e.getMessage());
+        }
+    }
+
+    /** Deletes the selected medicine after an explicit confirmation prompt (destructive action). */
+    private void deleteSelected() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            UIUtils.showError(this, "Select a medicine to delete.");
+            return;
+        }
+
+        String name = (String) tableModel.getValueAt(row, 1);
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Delete medicine \"" + name + "\"? This cannot be undone.",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        int medicineId = (int) tableModel.getValueAt(row, 0);
+        try {
+            medicineService.deleteMedicine(medicineId);
+            loadMedicines();
+        } catch (SQLException e) {
+            // Likely cause: existing sale_items rows reference this medicine_id and the
+            // foreign key is blocking the delete — surfaced as-is rather than masked.
+            UIUtils.showError(this, "Failed to delete medicine: " + e.getMessage());
+        }
+    }
+
+    /** Fetches suppliers for the form dialog's dropdown, or shows an error and returns null on failure. */
+    private List<Supplier> fetchSuppliersOrShowError() {
+        try {
+            return supplierService.getAllSuppliers();
+        } catch (SQLException e) {
+            UIUtils.showError(this, "Failed to load suppliers: " + e.getMessage());
+            return null;
+        }
+    }
+
+    /** Reconstructs a {@link Medicine} from a table row so it can be handed to the edit dialog. */
+    private Medicine medicineFromRow(int row) {
+        return new Medicine(
+                (int) tableModel.getValueAt(row, 0),
+                (String) tableModel.getValueAt(row, 1),
+                (String) tableModel.getValueAt(row, 2),
+                (String) tableModel.getValueAt(row, 3),
+                (BigDecimal) tableModel.getValueAt(row, 4),
+                (int) tableModel.getValueAt(row, 5),
+                (int) tableModel.getValueAt(row, 6),
+                (LocalDate) tableModel.getValueAt(row, 7),
+                (int) tableModel.getValueAt(row, 8)
+        );
+    }
+
+    /** Finds the enclosing {@link Frame} so dialogs can center themselves over the app window. */
+    private Frame ownerFrame() {
+        return (Frame) SwingUtilities.getWindowAncestor(this);
     }
 }

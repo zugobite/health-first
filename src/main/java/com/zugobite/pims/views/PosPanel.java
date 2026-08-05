@@ -15,6 +15,16 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * The Cashier's Point of Sale screen — the app's core workflow (PLAN.md §5.2): search for a
+ * medicine, add it to a running cart with a quantity, see the live total, and check out.
+ *
+ * <p>This panel owns the in-progress {@link Sale} object as UI state (the "cart"); it is
+ * only handed off to {@link SalesService#checkout} once, at the moment the Cashier clicks
+ * "Checkout". Everything before that point — search, add-to-cart, clear-cart — is purely
+ * local state with zero database writes, so a Cashier can freely browse and adjust the cart
+ * without side effects until they actually commit to the sale.</p>
+ */
 public class PosPanel extends JPanel {
 
     private final User cashier;
@@ -29,6 +39,8 @@ public class PosPanel extends JPanel {
     private final JTable cartTable = new JTable(cartModel);
     private final JLabel totalLabel = new JLabel("Total: R0.00");
 
+    // The in-progress cart. Reassigned (not mutated in place) by clearCart() — see that
+    // method's comment for why a fresh Sale is created rather than emptying the old one.
     private Sale currentSale;
 
     public PosPanel(User cashier, MedicineService medicineService, SalesService salesService) {
@@ -40,6 +52,7 @@ public class PosPanel extends JPanel {
         setLayout(new BorderLayout(8, 8));
         UIUtils.applyStandardPadding(this);
 
+        // Top half: search box + results table for finding medicines to add to the cart.
         JPanel searchPanel = new JPanel(new BorderLayout(4, 4));
         JPanel searchTop = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton searchButton = new JButton("Search");
@@ -53,6 +66,7 @@ public class PosPanel extends JPanel {
         searchPanel.add(searchTop, BorderLayout.NORTH);
         searchPanel.add(new JScrollPane(searchResultsTable), BorderLayout.CENTER);
 
+        // Bottom half: the cart itself, its running total, and the Clear/Checkout actions.
         JPanel cartPanel = new JPanel(new BorderLayout(4, 4));
         cartPanel.add(new JScrollPane(cartTable), BorderLayout.CENTER);
 
@@ -68,11 +82,13 @@ public class PosPanel extends JPanel {
         cartFooter.add(cartButtons, BorderLayout.EAST);
         cartPanel.add(cartFooter, BorderLayout.SOUTH);
 
+        // Split pane lets the Cashier resize search-results vs. cart space to taste.
         JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, searchPanel, cartPanel);
         split.setResizeWeight(0.5);
         add(split, BorderLayout.CENTER);
     }
 
+    /** Partial-match search by name; results populate the top table for the Cashier to pick from. */
     private void search() {
         try {
             List<Medicine> results = medicineService.searchByName(searchField.getText().trim());
@@ -85,6 +101,13 @@ public class PosPanel extends JPanel {
         }
     }
 
+    /**
+     * Prompts for a quantity and adds the selected search result to {@link #currentSale} as
+     * a new {@link SaleItem}, capturing the medicine's *current* price at this exact moment
+     * (see {@link SaleItem}'s class comment on why that matters). Updates both the cart
+     * table and the running total label immediately, so the Cashier always sees an
+     * up-to-date total without needing to click anything else.
+     */
     private void addSelectedToCart() {
         int row = searchResultsTable.getSelectedRow();
         if (row < 0) {
@@ -107,12 +130,25 @@ public class PosPanel extends JPanel {
         totalLabel.setText("Total: R" + currentSale.getTotalAmount());
     }
 
+    /**
+     * PLAN.md §5.2's "Clear cart" action. Starts a brand-new {@link Sale} rather than
+     * emptying {@code currentSale.getItems()} in place, since {@code Sale} has no
+     * "removeAllItems" method — its {@code addItem()}-only API keeps the running total
+     * always consistent with its item list by construction, so the simplest way to reset
+     * both together is to just replace the whole object.
+     */
     private void clearCart() {
         currentSale = new Sale(cashier.getUserId());
         cartModel.setRowCount(0);
         totalLabel.setText("Total: R0.00");
     }
 
+    /**
+     * Commits the cart: hands {@link #currentSale} to {@link SalesService#checkout} (which
+     * persists it as a single DB transaction — sale header, line items, and stock decrement
+     * all together), then opens the generated {@link BillView} and resets the cart for the
+     * next customer.
+     */
     private void checkout() {
         if (currentSale.getItems().isEmpty()) {
             UIUtils.showError(this, "The cart is empty.");
@@ -120,6 +156,8 @@ public class PosPanel extends JPanel {
         }
         try {
             salesService.checkout(currentSale);
+            // By this point currentSale.getSaleId() has been populated by checkout(), so the
+            // bill can reference the real, persisted sale number.
             new BillView(currentSale).setVisible(true);
             clearCart();
         } catch (SQLException e) {

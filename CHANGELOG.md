@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs/001-APPLICATION_REQUIREMENTS.md` and `docs/002-PROJECT_OVERVIEW.md`
 - `.github` meta (issue templates, PR template, security policy, CODEOWNERS, FUNDING)
 - `LICENSE`, `CONTRIBUTING.md`, `README.md`, `.gitignore`
+- Full Admin CRUD: `MedicineFormDialog`, `SupplierFormDialog`, and `CashierFormDialog` wired into
+  `ManageMedicinesPanel`, `ManageSuppliersPanel`, and `ManageUsersPanel` (Add/Edit/Delete with
+  confirmation prompts and `InputValidator`-backed form validation)
+- Comprehensive Javadoc and inline maintainer comments across every class in `src/`
 
 ### Changed
 

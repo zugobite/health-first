@@ -6,13 +6,25 @@ import com.zugobite.pims.utils.UIUtils;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
+import java.awt.*;
 
+/**
+ * Admin tab for managing Cashier accounts (PLAN.md §5.3 "Manage Users tab":
+ * "create/delete/manage Cashier accounts").
+ *
+ * <p>Deliberately scoped to Cashier accounts only — {@link UserService#getCashiers()} never
+ * returns the logged-in Admin, so there's no risk of an Admin accidentally deleting their
+ * own account from this screen, and no "Edit" action since PLAN.md only calls for
+ * create/delete.</p>
+ */
 public class ManageUsersPanel extends JPanel {
 
     private final UserService userService;
+
+    // Column order here must match the order values are appended in loadCashiers() below.
     private final DefaultTableModel tableModel = new DefaultTableModel(
             new Object[]{"ID", "Username", "Full Name", "Role"}, 0
     ) {
@@ -34,7 +46,11 @@ public class ManageUsersPanel extends JPanel {
         JButton refreshButton = new JButton("Refresh");
         JButton addButton = new JButton("Add Cashier");
         JButton deleteButton = new JButton("Delete");
+
         refreshButton.addActionListener(e -> loadCashiers());
+        addButton.addActionListener(e -> openAddDialog());
+        deleteButton.addActionListener(e -> deleteSelected());
+
         buttons.add(refreshButton);
         buttons.add(addButton);
         buttons.add(deleteButton);
@@ -43,6 +59,7 @@ public class ManageUsersPanel extends JPanel {
         loadCashiers();
     }
 
+    /** Re-queries every Cashier account from the database and repopulates the table from scratch. */
     public void loadCashiers() {
         try {
             List<User> cashiers = userService.getCashiers();
@@ -53,5 +70,62 @@ public class ManageUsersPanel extends JPanel {
         } catch (SQLException e) {
             UIUtils.showError(this, "Failed to load cashier accounts: " + e.getMessage());
         }
+    }
+
+    /** Opens {@link CashierFormDialog}; on confirmation, creates the account and refreshes the table. */
+    private void openAddDialog() {
+        CashierFormDialog dialog = new CashierFormDialog(ownerFrame());
+        dialog.setVisible(true);
+
+        Optional<CashierFormDialog.CashierInput> input = dialog.getResult();
+        if (input.isEmpty()) {
+            return;
+        }
+
+        try {
+            CashierFormDialog.CashierInput cashier = input.get();
+            userService.createCashier(cashier.username(), cashier.password(), cashier.fullName());
+            loadCashiers();
+        } catch (SQLException e) {
+            // Most likely cause: the `username` UNIQUE constraint rejected a duplicate —
+            // surfaced as-is so the admin knows to pick a different username.
+            UIUtils.showError(this, "Failed to create cashier account: " + e.getMessage());
+        }
+    }
+
+    /** Deletes the selected Cashier account after an explicit confirmation prompt. */
+    private void deleteSelected() {
+        int row = table.getSelectedRow();
+        if (row < 0) {
+            UIUtils.showError(this, "Select a cashier account to delete.");
+            return;
+        }
+
+        String username = (String) tableModel.getValueAt(row, 1);
+        int confirm = JOptionPane.showConfirmDialog(
+                this,
+                "Delete cashier account \"" + username + "\"? This cannot be undone.",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE
+        );
+        if (confirm != JOptionPane.YES_OPTION) {
+            return;
+        }
+
+        int userId = (int) tableModel.getValueAt(row, 0);
+        try {
+            userService.deleteUser(userId);
+            loadCashiers();
+        } catch (SQLException e) {
+            // Likely cause: existing sales rows reference this user_id as the cashier who
+            // processed them, and the foreign key is blocking the delete.
+            UIUtils.showError(this, "Failed to delete cashier account: " + e.getMessage());
+        }
+    }
+
+    /** Finds the enclosing {@link Frame} so dialogs can center themselves over the app window. */
+    private Frame ownerFrame() {
+        return (Frame) SwingUtilities.getWindowAncestor(this);
     }
 }

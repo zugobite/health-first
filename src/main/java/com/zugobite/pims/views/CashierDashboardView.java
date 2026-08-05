@@ -6,6 +6,13 @@ import com.zugobite.pims.services.SalesService;
 
 import javax.swing.*;
 
+/**
+ * The Cashier's main window: a tabbed shell around the two screens PLAN.md §5.2 requires —
+ * Point of Sale (search/cart/checkout/bill) and a standalone Stock Check lookup. No Manage
+ * Medicines / Suppliers / Users / Reports tabs exist here at all, which is how "Cashier UI
+ * must not expose add/edit/delete for medicines" is enforced: those tabs are simply never
+ * constructed for a Cashier session.
+ */
 public class CashierDashboardView extends JFrame {
 
     public CashierDashboardView(User cashier, MedicineService medicineService, SalesService salesService) {

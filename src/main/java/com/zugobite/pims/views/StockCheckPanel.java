@@ -10,6 +10,12 @@ import java.awt.*;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Cashier's "look up a medicine's price/availability without starting a sale" screen
+ * (PLAN.md §5.2). Deliberately separate from {@link PosPanel}'s own search box — a Cashier
+ * answering a customer's "do you have X, how much is it?" question shouldn't need to touch
+ * an in-progress cart to do it, and this tab makes that a read-only, side-effect-free action.
+ */
 public class StockCheckPanel extends JPanel {
 
     private final MedicineService medicineService;
@@ -40,6 +46,7 @@ public class StockCheckPanel extends JPanel {
         add(new JScrollPane(table), BorderLayout.CENTER);
     }
 
+    /** Runs a partial-match search and repopulates the results table — read-only, no cart involved. */
     private void search() {
         try {
             List<Medicine> results = medicineService.searchByName(searchField.getText().trim());
