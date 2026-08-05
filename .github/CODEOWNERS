@@ -1,0 +1,13 @@
+# Default owner for everything
+* @zugobite
+
+# Source code
+/src/ @zugobite
+
+# Documentation
+/docs/ @zugobite
+*.md @zugobite
+
+# Configuration
+/.github/ @zugobite
+.gitignore @zugobite
