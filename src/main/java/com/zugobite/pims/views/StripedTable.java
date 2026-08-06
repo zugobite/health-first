@@ -8,15 +8,15 @@ import java.awt.Component;
 
 /**
  * A {@link JTable} with alternating-row ("zebra") striping and a few sensible defaults
- * (taller rows, no reorderable columns, no grid lines — FlatLaf's own borders already
- * separate cells cleanly). Every data table in the app — Manage Medicines/Suppliers/Users,
- * Reports, POS search/cart, Stock Check — uses this instead of a bare {@code JTable}, so the
+ * (taller rows, no reorderable columns, no grid lines - FlatLaf's own borders already
+ * separate cells cleanly). Every data table in the app - Manage Medicines/Suppliers/Users,
+ * Reports, POS search/cart, Stock Check - uses this instead of a bare {@code JTable}, so the
  * "looks professional" bar (striped rows are one of the most recognisable marks of a
  * polished data table, the same convention Excel, Finder, and most admin dashboards use)
  * is met consistently everywhere at once instead of being hand-rolled per screen.
  *
  * <p>Striping is implemented by overriding {@link #prepareRenderer}, the standard vanilla-Swing
- * technique for this — it runs after the real cell renderer has already set the cell's
+ * technique for this - it runs after the real cell renderer has already set the cell's
  * content and default colors, so it only needs to override the background, and only for
  * unselected rows (selection highlighting must never be fought with by striping).</p>
  */

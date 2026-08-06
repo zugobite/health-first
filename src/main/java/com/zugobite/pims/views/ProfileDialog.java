@@ -13,7 +13,7 @@ import java.awt.*;
  *
  * <p>Deliberately view-only: there's no edit/save flow here. {@link User} itself has no
  * setters (see its class comment), and profile self-editing (changing your own password,
- * etc.) isn't part of PLAN.md's scope — Admin's only user-management capability is
+ * etc.) isn't part of PLAN.md's scope - Admin's only user-management capability is
  * create/delete of *Cashier* accounts, not self-service profile edits for anyone.</p>
  */
 public class ProfileDialog extends JDialog {
@@ -51,7 +51,7 @@ public class ProfileDialog extends JDialog {
     }
 
     /** Adds one "label: value" row, using a plain (non-editable) {@link JLabel} for the value
-     *  since this dialog never lets the user change anything — a text field would wrongly
+     *  since this dialog never lets the user change anything - a text field would wrongly
      *  imply these fields are editable. */
     private void addRow(JPanel panel, GridBagConstraints gbc, int row, String label, String value) {
         gbc.gridx = 0;

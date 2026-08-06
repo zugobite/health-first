@@ -15,7 +15,7 @@ import java.util.Optional;
  * success (PLAN.md §5.1 "On success: redirect by role → AdminDashboard or
  * CashierDashboard").
  *
- * <p>This is the only controller {@link com.zugobite.pims.Main} instantiates directly —
+ * <p>This is the only controller {@link com.zugobite.pims.Main} instantiates directly -
  * {@link AdminController} and {@link CashierController} are created here, one level down,
  * once we know which role just logged in.</p>
  */
@@ -42,7 +42,7 @@ public class LoginController {
                 loginView.showError("Invalid username or password.");
                 return;
             }
-            // Only close the login window once we know login actually succeeded — if we
+            // Only close the login window once we know login actually succeeded - if we
             // disposed it unconditionally, a failed login would leave the user stranded
             // with no window at all.
             loginView.dispose();
@@ -71,7 +71,7 @@ public class LoginController {
      * Returns to the login screen after a "Log Out" click. By this point the dashboard that
      * triggered it has already disposed itself (see {@link com.zugobite.pims.views.SidebarNav}),
      * so all that's left is to blank out any stale credentials from the *previous* session
-     * and re-show the same {@link #loginView} instance — Swing supports calling
+     * and re-show the same {@link #loginView} instance - Swing supports calling
      * {@code setVisible(true)} again on a disposed {@link javax.swing.JFrame}; it simply
      * recreates the native window, so there's no need to build a brand-new {@code LoginView}
      * (or a brand-new {@code LoginController}) just to log back in.

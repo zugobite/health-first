@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data-access layer for the `suppliers` table — straightforward CRUD backing Admin's
+ * Data-access layer for the `suppliers` table - straightforward CRUD backing Admin's
  * "Manage Suppliers" tab ({@link com.zugobite.pims.views.ManageSuppliersPanel}).
  *
  * <p>Also consumed read-only by {@link com.zugobite.pims.views.MedicineFormDialog} (via
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class SupplierService {
 
-    /** All suppliers, alphabetical by name — the order the "Manage Suppliers" table and the
+    /** All suppliers, alphabetical by name - the order the "Manage Suppliers" table and the
      *  medicine form's supplier dropdown both display them in. */
     public List<Supplier> getAllSuppliers() throws SQLException {
         List<Supplier> suppliers = new ArrayList<>();
@@ -35,7 +35,7 @@ public class SupplierService {
         return suppliers;
     }
 
-    /** Inserts a new supplier. The {@code supplier.getSupplierId()} value is ignored — MySQL
+    /** Inserts a new supplier. The {@code supplier.getSupplierId()} value is ignored - MySQL
      *  assigns the real ID via AUTO_INCREMENT. */
     public void addSupplier(Supplier supplier) throws SQLException {
         String sql = "INSERT INTO suppliers (name, contact_person, phone, email, address) VALUES (?, ?, ?, ?, ?)";
@@ -61,7 +61,7 @@ public class SupplierService {
      * Deletes a supplier by ID.
      *
      * @throws SQLException if the `medicines.supplier_id` foreign key blocks the delete
-     *                       because one or more medicines still reference this supplier —
+     *                       because one or more medicines still reference this supplier -
      *                       those medicines must be reassigned or removed first
      */
     public void deleteSupplier(int supplierId) throws SQLException {

@@ -29,7 +29,7 @@ public class ReportService {
 
     /**
      * Every sale between {@code from} and {@code to} (inclusive), joined with the cashier's
-     * name. Powers the "Sales report — transactions over a date range" requirement.
+     * name. Powers the "Sales report - transactions over a date range" requirement.
      */
     public List<Map<String, Object>> getSalesReport(LocalDate from, LocalDate to) throws SQLException {
         String sql = "SELECT s.sale_id, s.sale_date, s.total_amount, u.full_name AS cashier "
@@ -55,7 +55,7 @@ public class ReportService {
     }
 
     /**
-     * Sales aggregated per medicine — total quantity sold and total revenue, richest first.
+     * Sales aggregated per medicine - total quantity sold and total revenue, richest first.
      * Powers the "Item-Wise report" requirement. Deliberately reads from `sale_items`
      * (historical, immutable per-sale prices) rather than joining live `medicines.price`, so
      * this report reflects what customers were actually charged at the time, not today's
@@ -81,8 +81,8 @@ public class ReportService {
     }
 
     /**
-     * Every medicine at or below its reorder threshold. Powers the "Low Stock report —
-     * medicines where quantity_in_stock <= reorder_level" requirement — the same condition
+     * Every medicine at or below its reorder threshold. Powers the "Low Stock report -
+     * medicines where quantity_in_stock <= reorder_level" requirement - the same condition
      * as {@link com.zugobite.pims.models.Medicine#isLowStock()}, just run as an aggregate
      * query across the whole table instead of checked on one object at a time.
      */
@@ -93,7 +93,7 @@ public class ReportService {
 
     /**
      * Every medicine expiring within the next month from today. Powers the "Expiry report"
-     * requirement — uses MySQL's own {@code CURDATE()}/{@code DATE_ADD()} (evaluated on the
+     * requirement - uses MySQL's own {@code CURDATE()}/{@code DATE_ADD()} (evaluated on the
      * database server) rather than passing today's date in from Java, so the report is
      * always correct relative to the DB server's clock regardless of the client machine's.
      */
@@ -106,7 +106,7 @@ public class ReportService {
     /**
      * Runs a report query that takes no parameters and returns whatever columns it selects,
      * mapping each row generically via {@link java.sql.ResultSetMetaData} instead of naming
-     * columns by hand — shared by {@link #getLowStockReport()} and {@link #getExpiryReport()}
+     * columns by hand - shared by {@link #getLowStockReport()} and {@link #getExpiryReport()}
      * since both are simple "SELECT ... WHERE ..." queries with no joins or bound parameters.
      */
     private List<Map<String, Object>> runSimpleQuery(String sql) throws SQLException {

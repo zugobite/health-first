@@ -20,7 +20,7 @@ import java.util.Optional;
  * supplier link (PLAN.md §5.3 "Manage Medicines tab").
  *
  * <p>Needs {@link SupplierService} in addition to {@link MedicineService} purely so the
- * "Add"/"Edit" dialog can offer a dropdown of valid suppliers — this panel never writes to
+ * "Add"/"Edit" dialog can offer a dropdown of valid suppliers - this panel never writes to
  * the `suppliers` table itself.</p>
  */
 public class ManageMedicinesPanel extends JPanel {
@@ -30,7 +30,7 @@ public class ManageMedicinesPanel extends JPanel {
 
     // Column order here must match the order values are appended in loadMedicines() below.
     private final DefaultTableModel tableModel = new DefaultTableModel(
-            new Object[]{"ID", "Name", "Company", "Type", "Price", "Stock", "Reorder", "Expiry", "Supplier ID"}, 0
+            new Object[]{"ID", "Name", "Company", "Type", "Price", "In Stock", "Reorder Level", "Expiry Date", "Supplier ID"}, 0
     ) {
         @Override
         public boolean isCellEditable(int row, int column) {
@@ -38,7 +38,7 @@ public class ManageMedicinesPanel extends JPanel {
         }
 
         // Declaring the numeric columns' real type (rather than the Object.class default)
-        // is what makes Swing's built-in table renderer right-align them automatically —
+        // is what makes Swing's built-in table renderer right-align them automatically -
         // JTable falls back through a value's superclasses to find a registered renderer,
         // and both Integer and BigDecimal resolve to the same right-aligned Number renderer.
         @Override
@@ -81,12 +81,12 @@ public class ManageMedicinesPanel extends JPanel {
         toolbar.add(deleteButton);
 
         // The table lives inside a bordered, rounded CardPanel rather than sitting directly
-        // on the page background — the same "content in a card" composition used on every
+        // on the page background - the same "content in a card" composition used on every
         // data screen in the app (see CardPanel's class comment).
         CardPanel card = new CardPanel(new BorderLayout(0, 12));
         card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         card.add(toolbar, BorderLayout.NORTH);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
+        card.add(UIUtils.createRoundedScrollPane(table), BorderLayout.CENTER);
 
         add(card, BorderLayout.CENTER);
 
@@ -195,7 +195,7 @@ public class ManageMedicinesPanel extends JPanel {
             loadMedicines();
         } catch (SQLException e) {
             // Likely cause: existing sale_items rows reference this medicine_id and the
-            // foreign key is blocking the delete — surfaced as-is rather than masked.
+            // foreign key is blocking the delete - surfaced as-is rather than masked.
             UIUtils.showError(this, "Failed to delete medicine: " + e.getMessage());
         }
     }

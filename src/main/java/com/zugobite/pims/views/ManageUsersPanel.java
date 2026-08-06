@@ -15,7 +15,7 @@ import java.awt.*;
  * Admin tab for managing Cashier accounts (PLAN.md §5.3 "Manage Users tab":
  * "create/delete/manage Cashier accounts").
  *
- * <p>Deliberately scoped to Cashier accounts only — {@link UserService#getCashiers()} never
+ * <p>Deliberately scoped to Cashier accounts only - {@link UserService#getCashiers()} never
  * returns the logged-in Admin, so there's no risk of an Admin accidentally deleting their
  * own account from this screen, and no "Edit" action since PLAN.md only calls for
  * create/delete.</p>
@@ -33,7 +33,7 @@ public class ManageUsersPanel extends JPanel {
             return false;
         }
 
-        // ID is the only numeric column here — declaring its real type right-aligns it via
+        // ID is the only numeric column here - declaring its real type right-aligns it via
         // Swing's built-in Number renderer (see ManageMedicinesPanel for the full explanation).
         @Override
         public Class<?> getColumnClass(int columnIndex) {
@@ -68,7 +68,7 @@ public class ManageUsersPanel extends JPanel {
         CardPanel card = new CardPanel(new BorderLayout(0, 12));
         card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         card.add(toolbar, BorderLayout.NORTH);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
+        card.add(UIUtils.createRoundedScrollPane(table), BorderLayout.CENTER);
 
         add(card, BorderLayout.CENTER);
 
@@ -103,7 +103,7 @@ public class ManageUsersPanel extends JPanel {
             userService.createCashier(cashier.username(), cashier.password(), cashier.fullName());
             loadCashiers();
         } catch (SQLException e) {
-            // Most likely cause: the `username` UNIQUE constraint rejected a duplicate —
+            // Most likely cause: the `username` UNIQUE constraint rejected a duplicate -
             // surfaced as-is so the admin knows to pick a different username.
             UIUtils.showError(this, "Failed to create cashier account: " + e.getMessage());
         }

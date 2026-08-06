@@ -39,7 +39,7 @@ Send a detailed report to the maintainer via:
 When contributing to PIMS, please ensure:
 
 1. **Never commit sensitive data** (passwords, DB credentials, API keys) to the repository
-2. **Use `PreparedStatement`** for all JDBC queries — never string-concatenate SQL
+2. **Use `PreparedStatement`** for all JDBC queries - never string-concatenate SQL
 3. **Validate all user input** before processing to prevent injection attacks
 4. **Use exception handling** for all database and file I/O operations
 5. **Do not hardcode credentials** or configuration values in source code

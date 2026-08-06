@@ -22,14 +22,14 @@ import java.util.List;
 import java.util.function.IntConsumer;
 
 /**
- * The left-hand navigation rail used by both dashboards — replaces the top {@link javax.swing.JTabbedPane}
+ * The left-hand navigation rail used by both dashboards - replaces the top {@link javax.swing.JTabbedPane}
  * previously used for screen switching, and folds in what used to be a separate
  * {@code AccountMenuBar}: a brand header at the top, one ghost-styled nav button per screen
  * in the middle, and the logged-in user's name/role plus "View Profile"/"Log Out" actions
  * pinned to the bottom.
  *
- * <p>This layout — icon/wordmark, a vertical list of nav items, a user block anchored at the
- * bottom — is the standard shape of virtually every modern admin dashboard (and is exactly
+ * <p>This layout - icon/wordmark, a vertical list of nav items, a user block anchored at the
+ * bottom - is the standard shape of virtually every modern admin dashboard (and is exactly
  * how shadcn/ui's own dashboard examples are composed), and reads as "enterprise software"
  * far more immediately than a row of tabs across the top ever does.</p>
  */
@@ -41,7 +41,7 @@ public class SidebarNav extends JPanel {
 
     /**
      * @param productName label shown next to the app icon at the top of the sidebar, e.g.
-     *                    "Admin" or "Cashier" — distinguishes which dashboard this is even
+     *                    "Admin" or "Cashier" - distinguishes which dashboard this is even
      *                    before the window title bar is visible
      * @param navLabels   one entry per screen this sidebar switches between, in display order
      * @param onSelect    invoked with the clicked item's index whenever the selection changes
@@ -80,7 +80,7 @@ public class SidebarNav extends JPanel {
         add(buildUserFooter(user, onLogout));
     }
 
-    /** Highlights the nav button at {@code index} and un-highlights every other one — called both internally on click and externally if a caller wants to sync the sidebar to an already-selected screen. */
+    /** Highlights the nav button at {@code index} and un-highlights every other one - called both internally on click and externally if a caller wants to sync the sidebar to an already-selected screen. */
     public void setSelected(int index) {
         for (int i = 0; i < navButtons.size(); i++) {
             boolean selected = i == index;
@@ -97,7 +97,7 @@ public class SidebarNav extends JPanel {
         }
     }
 
-    /** The app icon + product name at the top of the sidebar — a small, muted echo of the login screen's header band. */
+    /** The app icon + product name at the top of the sidebar - a small, muted echo of the login screen's header band. */
     private JPanel buildHeader(String productName) {
         JPanel header = new JPanel();
         header.setLayout(new BoxLayout(header, BoxLayout.X_AXIS));
@@ -128,7 +128,7 @@ public class SidebarNav extends JPanel {
 
     /**
      * The bottom-anchored block showing who's logged in, with quick access to their profile
-     * and a way to log out — this is what used to be a top {@link javax.swing.JMenuBar}
+     * and a way to log out - this is what used to be a top {@link javax.swing.JMenuBar}
      * ({@code AccountMenuBar}); moving it here keeps every piece of "who am I / how do I
      * leave" UI in the one place a user expects it in a sidebar-style app.
      */
@@ -153,8 +153,8 @@ public class SidebarNav extends JPanel {
 
         JButton profileButton = new JButton("View Profile");
         profileButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        profileButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-        UIUtils.styleAsOutlineButton(profileButton);
+        UIUtils.styleAsPrimaryButton(profileButton);
+        profileButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, profileButton.getPreferredSize().height));
         profileButton.addActionListener(e -> {
             Frame owner = (Frame) SwingUtilities.getWindowAncestor(this);
             new ProfileDialog(owner, user).setVisible(true);
@@ -162,11 +162,11 @@ public class SidebarNav extends JPanel {
 
         JButton logoutButton = new JButton("Log Out");
         logoutButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        logoutButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, 28));
-        UIUtils.styleAsOutlineButton(logoutButton);
+        UIUtils.styleAsSolidDestructiveButton(logoutButton);
+        logoutButton.setMaximumSize(new Dimension(Integer.MAX_VALUE, logoutButton.getPreferredSize().height));
         logoutButton.addActionListener(e -> {
             // Closing the owning window first, then invoking onLogout, mirrors the previous
-            // AccountMenuBar behavior — dispose() here does not trigger the window's
+            // AccountMenuBar behavior - dispose() here does not trigger the window's
             // EXIT_ON_CLOSE listener (that only fires from a user-initiated titlebar close),
             // so logging out can never accidentally exit the JVM.
             Frame owner = (Frame) SwingUtilities.getWindowAncestor(this);

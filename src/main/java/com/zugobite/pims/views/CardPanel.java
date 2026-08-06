@@ -10,7 +10,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 
 /**
- * A bordered, rounded-corner white container — the Swing equivalent of shadcn/ui's
+ * A bordered, rounded-corner white container - the Swing equivalent of shadcn/ui's
  * {@code Card} primitive. Every screen in the app wraps its main content (a data table, a
  * form) in one of these instead of placing it directly on the window background, which is
  * what turns a flat list of controls into something that reads as a deliberately composed
@@ -18,12 +18,12 @@ import java.awt.geom.RoundRectangle2D;
  *
  * <p>Painting is done by hand ({@link #paintComponent}) rather than via a
  * {@link javax.swing.border.Border}, because a rounded card needs its background fill
- * clipped to the same rounded rectangle as its border — a plain rectangular background
+ * clipped to the same rounded rectangle as its border - a plain rectangular background
  * painted underneath a rounded border would show square corners poking out from behind it.</p>
  */
 public class CardPanel extends JPanel {
 
-    private static final int CORNER_RADIUS = 10;
+    private static final int CORNER_RADIUS = UIUtils.CARD_RADIUS;
 
     public CardPanel() {
         this(null);

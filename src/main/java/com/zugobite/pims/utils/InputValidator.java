@@ -32,7 +32,7 @@ public final class InputValidator {
 
     /**
      * True if the string parses as a decimal number strictly greater than zero. Used for
-     * the `price` field — a free medicine or a negative price would never make sense for a
+     * the `price` field - a free medicine or a negative price would never make sense for a
      * pharmacy, so zero and negative values are rejected here rather than at the database.
      */
     public static boolean isPositiveDecimal(String input) {
@@ -58,7 +58,7 @@ public final class InputValidator {
 
     /**
      * True if the string parses as an ISO-8601 date ({@code yyyy-MM-dd}). Used for the
-     * expiry date field on {@link com.zugobite.pims.views.MedicineFormDialog} — this format
+     * expiry date field on {@link com.zugobite.pims.views.MedicineFormDialog} - this format
      * was chosen (over e.g. {@code dd/mm/yyyy}) because it's what {@link LocalDate#parse}
      * accepts with zero extra formatting code, and it sorts correctly as plain text too.
      */

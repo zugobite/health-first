@@ -1,6 +1,7 @@
 package com.zugobite.pims.utils;
 
 import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.FlatLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.JButton;
@@ -10,6 +11,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
@@ -17,68 +19,79 @@ import java.awt.Window;
 import java.awt.image.BufferedImage;
 
 /**
- * Small, stateless Swing helpers shared across every screen in the {@code views} package —
+ * Small, stateless Swing helpers shared across every screen in the {@code views} package -
  * the app's design system in one file: look-and-feel setup, a neutral color palette, button
  * variants, and layout/dialog conventions, so every screen draws from the same values
  * instead of picking its own.
  *
  * <p>The palette and component styling here deliberately follow the same visual language as
- * shadcn/ui (neutral zinc grays, a near-black primary action color, subtle borders instead
- * of heavy chrome, consistently rounded corners) — that's a web/React/Tailwind component
- * library with no Java equivalent, so it can't be "installed" here, but its <em>look</em> is
- * fully reproducible in Swing via FlatLaf's per-component styling API
- * ({@link FlatClientProperties#STYLE}), which is what {@link #styleAsPrimaryButton} and
- * friends below use. See {@link com.zugobite.pims.views.CardPanel} for the other half of
- * that visual language — bordered, rounded "card" containers instead of bare panels.</p>
+ * shadcn/ui (neutral zinc grays, subtle borders instead of heavy chrome, consistently
+ * rounded corners) with HealthFirst's logo teal as the primary action color - that's a
+ * web/React/Tailwind component library with no Java equivalent, so it can't be "installed"
+ * here, but its <em>look</em> is fully reproducible in Swing via FlatLaf's per-component
+ * styling API ({@link FlatClientProperties#STYLE}), which is what
+ * {@link #styleAsPrimaryButton} and friends below use. See
+ * {@link com.zugobite.pims.views.CardPanel} for the other half of that visual language -
+ * bordered, rounded "card" containers instead of bare panels.</p>
  */
 public final class UIUtils {
 
     // ---------------------------------------------------------------------
-    // Design tokens — a neutral "zinc" palette (the shadcn/ui default theme's palette) plus
-    // one brand accent. Every color used anywhere in the UI should trace back to one of
-    // these constants rather than being a one-off literal, so the whole app reads as one
-    // consistent, considered design instead of a pile of individually-styled screens.
+    // Design tokens - a neutral "zinc" palette (the shadcn/ui default theme's palette) plus
+    // the logo teal as primary. Every color used anywhere in the UI should trace back to
+    // one of these constants rather than being a one-off literal, so the whole app reads
+    // as one consistent, considered design instead of a pile of individually-styled screens.
     // ---------------------------------------------------------------------
 
-    /** Page/card background — pure white. */
+    /** Page/card background - pure white. */
     public static final Color BACKGROUND = Color.WHITE;
-    /** Sidebar and subtle-section background — zinc-50. */
+    /** Sidebar and subtle-section background - zinc-50. */
     public static final Color MUTED_BACKGROUND = new Color(0xFA, 0xFA, 0xFA);
-    /** Hover background for outline/ghost controls — zinc-100. */
+    /** Hover background for outline/ghost controls - zinc-100. */
     public static final Color HOVER_BACKGROUND = new Color(0xF4, 0xF4, 0xF5);
-    /** Card/divider/input borders — zinc-200. */
+    /** Card/divider/input borders - zinc-200. */
     public static final Color BORDER_COLOR = new Color(0xE4, 0xE4, 0xE7);
-    /** Primary text color — zinc-900. */
+    /** Primary text color - zinc-900. */
     public static final Color FOREGROUND = new Color(0x18, 0x18, 0x1B);
-    /** Secondary/caption text color — zinc-500. */
+    /** Secondary/caption text color - zinc-500. */
     public static final Color MUTED_FOREGROUND = new Color(0x71, 0x71, 0x7A);
 
-    /** Primary action background (buttons like "Log In", "Save", "Checkout") — near-black, the shadcn/ui default-theme primary color. */
-    public static final Color PRIMARY = new Color(0x18, 0x18, 0x1B);
-    /** Hover shade for {@link #PRIMARY} buttons — zinc-800. */
-    public static final Color PRIMARY_HOVER = new Color(0x27, 0x27, 0x2A);
+    /** Primary action background (buttons like "Log In", "Save", "Checkout") - logo lit-surface teal. */
+    public static final Color PRIMARY = new Color(0x17, 0x8F, 0x84);
+    /** Hover shade for {@link #PRIMARY} buttons - mid logo teal (same as {@link #ACCENT_COLOR}). */
+    public static final Color PRIMARY_HOVER = new Color(0x0F, 0x76, 0x6E);
+    /** Pressed shade for {@link #PRIMARY} buttons - logo gradient bottom. */
+    public static final Color PRIMARY_PRESSED = new Color(0x0A, 0x4F, 0x49);
     /** Text color on top of {@link #PRIMARY}. */
     public static final Color PRIMARY_FOREGROUND = Color.WHITE;
 
-    /** Destructive action color (Delete buttons) — red-600. */
+    /** Destructive action color (Delete buttons) - red-600. */
     public static final Color DESTRUCTIVE = new Color(0xDC, 0x26, 0x26);
-    /** Very light red hover background for outline-style destructive buttons — red-50. */
+    /** Hover shade for solid destructive buttons - red-700. */
+    public static final Color DESTRUCTIVE_HOVER = new Color(0xB9, 0x1C, 0x1C);
+    /** Pressed shade for solid destructive buttons - red-800. */
+    public static final Color DESTRUCTIVE_PRESSED = new Color(0x99, 0x1B, 0x1B);
+    /** Very light red hover background for outline-style destructive buttons - red-50. */
     public static final Color DESTRUCTIVE_HOVER_BACKGROUND = new Color(0xFE, 0xF2, 0xF2);
-    /** Border for outline-style destructive buttons — red-200. */
+    /** Border for outline-style destructive buttons - red-200. */
     public static final Color DESTRUCTIVE_BORDER = new Color(0xFE, 0xCA, 0xCA);
 
     /**
-     * HealthFirst's brand color — a medical/pharmacy-appropriate teal, used as FlatLaf's
-     * global accent color (see {@link #installLookAndFeel()}) purely for focus rings and
-     * text-selection highlighting, and for the app icon (see {@link #createAppIcon()}) and
-     * a few small brand touches (the login header band, the POS total). Primary buttons
-     * intentionally use {@link #PRIMARY} (near-black) instead of this accent — that
-     * neutral-primary-button + colored-focus-ring combination is exactly how shadcn/ui's own
-     * default theme is composed.
+     * HealthFirst's brand color - a medical/pharmacy-appropriate teal, used as FlatLaf's
+     * global accent color (see {@link #installLookAndFeel()}) for focus rings and
+     * text-selection highlighting, and for the app icon (see {@link #createAppIcon()}).
+     * Primary buttons use {@link #PRIMARY} (the brighter logo surface teal); this mid-teal
+     * is their hover shade and the focus-ring accent.
      */
     public static final Color ACCENT_COLOR = new Color(0x0F, 0x76, 0x6E);
 
     private static final int RADIUS = 8;
+    /** Corner radius for cards and rounded table scroll panes - slightly softer than controls. */
+    public static final int CARD_RADIUS = 10;
+    /** Vertical padding (py) shared by every button and text/combo input. */
+    private static final int CONTROL_PAD_Y = 8;
+    /** Horizontal padding (px) shared by every button and text/combo input. */
+    private static final int CONTROL_PAD_X = 12;
 
     // Utility class: never instantiated.
     private UIUtils() {
@@ -88,27 +101,34 @@ public final class UIUtils {
      * Installs FlatLaf's light theme with {@link #ACCENT_COLOR} as the global accent, plus a
      * set of global overrides (corner radius, focus ring width, scrollbar style) that push
      * FlatLaf's default look toward the flatter, more rounded, lower-chrome aesthetic of
-     * shadcn/ui — in place of Swing's default "Metal" look. This is the single highest-impact
+     * shadcn/ui - in place of Swing's default "Metal" look. This is the single highest-impact
      * call in the whole UI layer: it changes every button, field, table, and scrollbar in the
      * app at once, before any other styling in this class or {@link com.zugobite.pims.views.CardPanel}
      * layers on top.
      *
-     * <p>Must be called before any Swing component is constructed — see
+     * <p>Must be called before any Swing component is constructed - see
      * {@link com.zugobite.pims.Main#main}, which calls this first thing on the Event
      * Dispatch Thread, before {@code LoginController} builds the login window.</p>
      *
      * <p>The accent-color override has to be set via {@code UIManager.put(...)} <em>before</em>
-     * {@link FlatLightLaf#setup()} runs — that's the FlatLaf-documented hook for a custom
+     * {@link FlatLightLaf#setup()} runs - that's the FlatLaf-documented hook for a custom
      * accent color: {@code setup()} reads this value while building its defaults table, so
      * every accent-derived color (focus rings, selection backgrounds) is computed from it
      * automatically. The corner-radius/scrollbar overrides below are ordinary UIManager keys
      * and are applied after {@code setup()}, which is the correct order for those.</p>
      */
     public static void installLookAndFeel() {
-        UIManager.put("Component.accentColor", ACCENT_COLOR);
+        // FlatLaf's theme defaults use `@accentColor = systemColor(accent, null)`, which on
+        // macOS resolves to the system accent (blue). That paints every default/focused
+        // button as white-with-blue-border - overriding our primary fill. Pin the accent to
+        // logo teal *before* setup() so focus rings, default-button borders, and selection
+        // colors all resolve to green instead of blue.
+        FlatLaf.setGlobalExtraDefaults(java.util.Collections.singletonMap(
+                "@accentColor", "#" + hex(PRIMARY)));
+        UIManager.put("Component.accentColor", PRIMARY);
         FlatLightLaf.setup();
 
-        // Rounded corners everywhere — the single biggest visual signal of a modern,
+        // Rounded corners everywhere - the single biggest visual signal of a modern,
         // "designed" UI versus Swing's boxy default. 8px on buttons/fields/menus matches
         // Tailwind's "rounded-lg" scale that shadcn/ui components use.
         UIManager.put("Button.arc", RADIUS);
@@ -118,12 +138,35 @@ public final class UIUtils {
         UIManager.put("ProgressBar.arc", RADIUS);
         UIManager.put("PopupMenu.borderInsets", new java.awt.Insets(4, 4, 4, 4));
 
-        // A thin, subtle focus ring rather than FlatLaf's default thicker glow — closer to
+        // Same py/px on every button and text/combo input so controls share one silhouette.
+        java.awt.Insets controlInsets = new java.awt.Insets(
+                CONTROL_PAD_Y, CONTROL_PAD_X, CONTROL_PAD_Y, CONTROL_PAD_X);
+        UIManager.put("Button.margin", controlInsets);
+        UIManager.put("TextField.margin", controlInsets);
+        UIManager.put("PasswordField.margin", controlInsets);
+        UIManager.put("FormattedTextField.margin", controlInsets);
+        UIManager.put("ComboBox.padding", controlInsets);
+
+        // A thin, subtle focus ring rather than FlatLaf's default thicker glow - closer to
         // Tailwind's 1-2px ring utility that shadcn/ui inputs use.
         UIManager.put("Component.focusWidth", 1);
         UIManager.put("Component.innerFocusWidth", 0);
+        UIManager.put("Component.focusColor", PRIMARY);
+        UIManager.put("Component.focusedBorderColor", PRIMARY);
 
-        // Thin, fully-rounded "pill" scrollbar thumbs with no visible track — the minimal
+        // Default (root-pane) buttons: solid logo teal, not FlatLaf's white + accent border.
+        UIManager.put("Button.default.background", PRIMARY);
+        UIManager.put("Button.default.foreground", PRIMARY_FOREGROUND);
+        UIManager.put("Button.default.focusedBackground", PRIMARY);
+        UIManager.put("Button.default.hoverBackground", PRIMARY_HOVER);
+        UIManager.put("Button.default.pressedBackground", PRIMARY_PRESSED);
+        UIManager.put("Button.default.borderColor", PRIMARY);
+        UIManager.put("Button.default.hoverBorderColor", PRIMARY_HOVER);
+        UIManager.put("Button.default.focusedBorderColor", PRIMARY);
+        UIManager.put("Button.default.focusColor", PRIMARY);
+        UIManager.put("Button.default.borderWidth", 0);
+
+        // Thin, fully-rounded "pill" scrollbar thumbs with no visible track - the minimal
         // overlay-scrollbar look most modern web and native apps use now, instead of
         // Swing's default chunky, square scrollbar.
         UIManager.put("ScrollBar.width", 10);
@@ -140,6 +183,12 @@ public final class UIUtils {
         UIManager.put("Table.selectionForeground", FOREGROUND);
         UIManager.put("TableHeader.background", MUTED_BACKGROUND);
         UIManager.put("TableHeader.bottomSeparatorColor", BORDER_COLOR);
+        UIManager.put("TextField.selectionBackground", PRIMARY);
+        UIManager.put("TextField.selectionForeground", PRIMARY_FOREGROUND);
+        UIManager.put("PasswordField.selectionBackground", PRIMARY);
+        UIManager.put("PasswordField.selectionForeground", PRIMARY_FOREGROUND);
+        UIManager.put("TextArea.selectionBackground", PRIMARY);
+        UIManager.put("TextArea.selectionForeground", PRIMARY_FOREGROUND);
     }
 
     /**
@@ -151,8 +200,63 @@ public final class UIUtils {
         component.setBorder(new EmptyBorder(12, 12, 12, 12));
     }
 
+    /**
+     * Sets FlatLaf placeholder text on a text field, password field, or text area. The
+     * placeholder should match the field's visible label exactly (including a trailing
+     * colon when the label has one).
+     */
+    public static void setPlaceholder(JComponent field, String labelText) {
+        field.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, labelText);
+    }
+
+    /**
+     * Like {@link #setPlaceholder}, but also unwraps a {@link javax.swing.JScrollPane} so
+     * form {@code addRow} helpers can pass either the raw field or a scrolled text area.
+     */
+    public static void setPlaceholderOnInput(Component fieldOrScroll, String labelText) {
+        JComponent target = null;
+        if (fieldOrScroll instanceof javax.swing.JTextField
+                || fieldOrScroll instanceof javax.swing.JPasswordField
+                || fieldOrScroll instanceof javax.swing.JTextArea) {
+            target = (JComponent) fieldOrScroll;
+        } else if (fieldOrScroll instanceof javax.swing.JScrollPane scroll) {
+            Component view = scroll.getViewport().getView();
+            if (view instanceof javax.swing.JTextField
+                    || view instanceof javax.swing.JPasswordField
+                    || view instanceof javax.swing.JTextArea) {
+                target = (JComponent) view;
+            }
+        }
+        if (target != null) {
+            setPlaceholder(target, labelText);
+        }
+    }
+
+    /**
+     * Converts a raw map key or DB-style column name (camelCase like {@code totalAmount},
+     * or snake_case like {@code quantity_in_stock}) into a human-readable header, e.g.
+     * {@code "Total Amount"} / {@code "Quantity In Stock"}. Used by on-screen report
+     * tables and by PDF/Excel export so both surfaces show the same labels.
+     */
+    public static String prettifyColumnName(String key) {
+        if (key == null || key.isEmpty()) {
+            return "";
+        }
+        String spaced = key.replace('_', ' ').replaceAll("([a-z])([A-Z])", "$1 $2");
+        StringBuilder result = new StringBuilder();
+        for (String word : spaced.split("\\s+")) {
+            if (word.isEmpty()) {
+                continue;
+            }
+            result.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1).toLowerCase())
+                    .append(' ');
+        }
+        return result.toString().trim();
+    }
+
     // ---------------------------------------------------------------------
-    // Button variants — the shadcn/ui "Button" component's variant set (primary / outline /
+    // Button variants - the shadcn/ui "Button" component's variant set (primary / outline /
     // destructive), each implemented as a FlatLaf per-component style string rather than a
     // custom JButton subclass. This is FlatLaf's documented styling mechanism
     // (FlatClientProperties.STYLE): a semicolon-separated list of "key: value" pairs that
@@ -161,56 +265,157 @@ public final class UIUtils {
     // ---------------------------------------------------------------------
 
     /**
-     * The main call-to-action style: solid near-black background, white text — used for
+     * Shared FlatLaf style fragment: same corner radius and py/px margin on every styled
+     * button so variants only differ by color, not shape or spacing.
+     */
+    private static String controlShapeStyle() {
+        return String.format("arc: %d; margin: %d,%d,%d,%d;",
+                RADIUS, CONTROL_PAD_Y, CONTROL_PAD_X, CONTROL_PAD_Y, CONTROL_PAD_X);
+    }
+
+    /**
+     * The main call-to-action style: solid logo-teal background, white text - used for
      * exactly one button per screen (the single most important action: "Log In", "Save",
      * "Checkout", a dialog's "OK"), the same restraint shadcn/ui's own guidance recommends
      * for its {@code default} button variant.
      */
     public static void styleAsPrimaryButton(JButton button) {
+        // Include default.* keys: FlatLaf paints root-pane default buttons from those
+        // separately, and without them the button stays white with a system-accent border.
         button.putClientProperty(FlatClientProperties.STYLE, String.format(
-                "arc: %d; borderWidth: 0; focusWidth: 0; innerFocusWidth: 0;" +
-                        "background: #%s; foreground: #%s; hoverBackground: #%s; pressedBackground: #000000;",
-                RADIUS, hex(PRIMARY), hex(PRIMARY_FOREGROUND), hex(PRIMARY_HOVER)
+                "%s borderWidth: 0; focusWidth: 0; innerFocusWidth: 0;" +
+                        "background: #%s; foreground: #%s; hoverBackground: #%s; pressedBackground: #%s;" +
+                        "default.background: #%s; default.foreground: #%s;" +
+                        "default.focusedBackground: #%s; default.hoverBackground: #%s; default.pressedBackground: #%s;" +
+                        "default.borderColor: #%s; default.hoverBorderColor: #%s; default.focusedBorderColor: #%s;" +
+                        "default.focusColor: #%s; default.borderWidth: 0;",
+                controlShapeStyle(),
+                hex(PRIMARY), hex(PRIMARY_FOREGROUND), hex(PRIMARY_HOVER), hex(PRIMARY_PRESSED),
+                hex(PRIMARY), hex(PRIMARY_FOREGROUND),
+                hex(PRIMARY), hex(PRIMARY_HOVER), hex(PRIMARY_PRESSED),
+                hex(PRIMARY), hex(PRIMARY_HOVER), hex(PRIMARY),
+                hex(PRIMARY)
         ));
     }
 
     /**
      * The default, lower-emphasis style: white background, a thin neutral border, dark text.
-     * Used for every secondary action — "Refresh", "Cancel", "Edit" — so the primary action
+     * Used for every secondary action - "Refresh", "Cancel", "Edit" - so the primary action
      * on a screen is the only one competing for attention.
      */
     public static void styleAsOutlineButton(JButton button) {
         button.putClientProperty(FlatClientProperties.STYLE, String.format(
-                "arc: %d; borderWidth: 1; focusWidth: 1;" +
+                "%s borderWidth: 1; focusWidth: 1;" +
                         "background: #%s; foreground: #%s; borderColor: #%s; hoverBorderColor: #%s; hoverBackground: #%s;",
-                RADIUS, hex(BACKGROUND), hex(FOREGROUND), hex(BORDER_COLOR), hex(new Color(0xD4, 0xD4, 0xD8)), hex(HOVER_BACKGROUND)
+                controlShapeStyle(), hex(BACKGROUND), hex(FOREGROUND), hex(BORDER_COLOR), hex(new Color(0xD4, 0xD4, 0xD8)), hex(HOVER_BACKGROUND)
         ));
     }
 
     /**
-     * The destructive-action style: white background, red text/border, light-red hover —
+     * The destructive-action style: white background, red text/border, light-red hover -
      * used for every "Delete" button. Intentionally an <em>outline</em> style rather than a
      * solid red fill, so a row of toolbar buttons doesn't read as "something's already gone
-     * wrong" at rest — the red only asserts itself on hover, right before the click that
+     * wrong" at rest - the red only asserts itself on hover, right before the click that
      * actually matters.
      */
     public static void styleAsDestructiveButton(JButton button) {
         button.putClientProperty(FlatClientProperties.STYLE, String.format(
-                "arc: %d; borderWidth: 1; focusWidth: 1;" +
+                "%s borderWidth: 1; focusWidth: 1;" +
                         "background: #%s; foreground: #%s; borderColor: #%s; hoverBackground: #%s;",
-                RADIUS, hex(BACKGROUND), hex(DESTRUCTIVE), hex(DESTRUCTIVE_BORDER), hex(DESTRUCTIVE_HOVER_BACKGROUND)
+                controlShapeStyle(), hex(BACKGROUND), hex(DESTRUCTIVE), hex(DESTRUCTIVE_BORDER), hex(DESTRUCTIVE_HOVER_BACKGROUND)
         ));
     }
 
     /**
-     * The lowest-emphasis style: no border, no background until hovered — used for
+     * Solid red fill with white text - used for high-emphasis destructive actions that should
+     * match the visual weight of a primary button (currently the sidebar "Log Out" control).
+     * Toolbar "Delete" buttons stay on {@link #styleAsDestructiveButton} (outline) so they
+     * don't dominate a row of actions at rest.
+     */
+    public static void styleAsSolidDestructiveButton(JButton button) {
+        button.putClientProperty(FlatClientProperties.STYLE, String.format(
+                "%s borderWidth: 0; focusWidth: 0; innerFocusWidth: 0;" +
+                        "background: #%s; foreground: #%s; hoverBackground: #%s; pressedBackground: #%s;",
+                controlShapeStyle(), hex(DESTRUCTIVE), hex(PRIMARY_FOREGROUND), hex(DESTRUCTIVE_HOVER), hex(DESTRUCTIVE_PRESSED)
+        ));
+    }
+
+    /**
+     * Wraps a data table in a borderless scroll pane inside a custom rounded, bordered
+     * panel. FlatLaf's {@code ScrollPane.Table.arc} is intentionally <em>not</em> used —
+     * it rounds the outline by inserting left/right padding (via
+     * {@code FlatScrollPaneBorder.getLeftRightPadding}), which leaves empty white gutters
+     * beside the table. Painting the round rect ourselves keeps the table edge-to-edge
+     * while still showing a rounded border.
+     */
+    public static JComponent createRoundedScrollPane(Component view) {
+        javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(view);
+        scroll.setBorder(new EmptyBorder(0, 0, 0, 0));
+        scroll.putClientProperty(FlatClientProperties.STYLE, "arc: 0; borderWidth: 0;");
+        scroll.getViewport().setBackground(BACKGROUND);
+        scroll.setOpaque(false);
+        scroll.getViewport().setOpaque(true);
+
+        return new RoundedViewportPanel(scroll);
+    }
+
+    /**
+     * Fills edge-to-edge with the scroll pane, clips children to a rounded rect, and draws
+     * the border stroke on top so corners look rounded without FlatLaf's arc insets.
+     */
+    private static final class RoundedViewportPanel extends JComponent {
+        RoundedViewportPanel(Component child) {
+            setLayout(new java.awt.BorderLayout());
+            setOpaque(false);
+            setBackground(BACKGROUND);
+            add(child, java.awt.BorderLayout.CENTER);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            float w = getWidth() - 1f;
+            float h = getHeight() - 1f;
+            java.awt.geom.RoundRectangle2D.Float shape =
+                    new java.awt.geom.RoundRectangle2D.Float(0, 0, w, h, CARD_RADIUS, CARD_RADIUS);
+            g2.setColor(getBackground());
+            g2.fill(shape);
+            g2.dispose();
+        }
+
+        @Override
+        protected void paintChildren(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.clip(new java.awt.geom.RoundRectangle2D.Float(
+                    1, 1, getWidth() - 3f, getHeight() - 3f, CARD_RADIUS, CARD_RADIUS));
+            super.paintChildren(g2);
+            g2.dispose();
+        }
+
+        @Override
+        public void paint(Graphics g) {
+            paintComponent(g);
+            paintChildren(g);
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(BORDER_COLOR);
+            g2.draw(new java.awt.geom.RoundRectangle2D.Float(
+                    0, 0, getWidth() - 1f, getHeight() - 1f, CARD_RADIUS, CARD_RADIUS));
+            g2.dispose();
+        }
+    }
+
+    /**
+     * The lowest-emphasis style: no border, no background until hovered - used for
      * navigation items (see {@link com.zugobite.pims.views.SidebarNav}) and other controls
      * that need to feel like part of the page's structure rather than a distinct button.
      */
     public static void styleAsGhostButton(JButton button) {
         button.putClientProperty(FlatClientProperties.STYLE, String.format(
-                "arc: %d; borderWidth: 0; focusWidth: 0; background: #%s; foreground: #%s; hoverBackground: #%s;",
-                RADIUS, hex(BACKGROUND), hex(FOREGROUND), hex(HOVER_BACKGROUND)
+                "%s borderWidth: 0; focusWidth: 0; background: #%s; foreground: #%s; hoverBackground: #%s;",
+                controlShapeStyle(), hex(BACKGROUND), hex(FOREGROUND), hex(HOVER_BACKGROUND)
         ));
     }
 
@@ -218,17 +423,17 @@ public final class UIUtils {
         return String.format("%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
     }
 
-    /** Standard modal error popup — used for validation failures and caught {@code SQLException}s alike. */
+    /** Standard modal error popup - used for validation failures and caught {@code SQLException}s alike. */
     public static void showError(Component parent, String message) {
         JOptionPane.showMessageDialog(parent, message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    /** Standard modal info popup — used for non-error confirmations (currently unused but kept for symmetry). */
+    /** Standard modal info popup - used for non-error confirmations (currently unused but kept for symmetry). */
     public static void showInfo(Component parent, String message) {
         JOptionPane.showMessageDialog(parent, message, "Info", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    // Lazily built and cached — every top-level window uses the same icon, so there is no
+    // Lazily built and cached - every top-level window uses the same icon, so there is no
     // reason to re-render the artwork once per window.
     private static Image appIcon;
 
@@ -244,17 +449,20 @@ public final class UIUtils {
 
     /**
      * Procedurally draws a "pharmacy cross" mark in the style Apple's own app icons moved to
-     * with macOS Tahoe's "Liquid Glass" redesign — a squircle (superellipse, not a plain
+     * with macOS Tahoe's "Liquid Glass" redesign - a squircle (superellipse, not a plain
      * rounded rectangle) with a layered glass surface: a top-lit gradient base, a soft glossy
      * highlight sweeping across the upper half, a darkened lower edge for depth, and a subtle
-     * drop shadow under the glyph — rather than the flat, single-color rounded-square icon
+     * drop shadow under the glyph - rather than the flat, single-color rounded-square icon
      * this app used before. Drawn procedurally (no bitmap asset) so the whole app's visual
      * identity stays self-contained in source code, with no binary to track in git and no
      * licensing question about where an icon image came from.
      *
      * <p>Rendered at a high internal resolution (256px) and scaled down by every caller as
      * needed (title bars, the sidebar header, the Dock icon), since the gradient/highlight
-     * layers need real pixels to read as "glass" rather than "flat" once shrunk.</p>
+     * layers need real pixels to read as "glass" rather than "flat" once shrunk. The
+     * squircle itself is inset by ~5% on each side so the Dock icon matches the visual
+     * weight of native macOS app icons (a full-bleed Java {@code Taskbar} image otherwise
+     * reads oversized next to peers; a larger inset reads undersized).</p>
      */
     public static Image createAppIcon() {
         if (appIcon != null) {
@@ -265,6 +473,13 @@ public final class UIUtils {
         Graphics2D g = image.createGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+
+        // Transparent margin around the squircle - keeps Dock/taskbar sizing in line with
+        // standard macOS icons without changing the artwork's internal proportions.
+        float pad = size * 0.05f;
+        float content = size - 2 * pad;
+        g.translate(pad, pad);
+        g.scale(content / size, content / size);
 
         java.awt.Shape squircle = createSquirclePath(size);
 
@@ -279,19 +494,19 @@ public final class UIUtils {
         clipped.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         clipped.clip(squircle);
 
-        // The glossy highlight — a large, soft, translucent white oval biased toward the top
-        // — is the single most recognisable trait of the "Liquid Glass" treatment: it's what
+        // The glossy highlight - a large, soft, translucent white oval biased toward the top
+        // - is the single most recognisable trait of the "Liquid Glass" treatment: it's what
         // makes a flat-colored shape read as a curved, reflective surface instead of paint.
         clipped.setPaint(new java.awt.GradientPaint(0, -size * 0.15f, new Color(255, 255, 255, 130), 0, size * 0.65f, new Color(255, 255, 255, 0)));
         clipped.fill(new java.awt.geom.Ellipse2D.Float(-size * 0.15f, -size * 0.4f, size * 1.3f, size * 1.05f));
 
-        // A darkened lower edge grounds the glass — without it, the highlight above would
+        // A darkened lower edge grounds the glass - without it, the highlight above would
         // leave the icon looking washed-out rather than lit from one direction.
         clipped.setPaint(new java.awt.GradientPaint(0, size * 0.55f, new Color(0, 0, 0, 0), 0, size, new Color(0, 0, 0, 80)));
         clipped.fillRect(0, 0, size, size);
         clipped.dispose();
 
-        // A thin, near-white rim stroke along the whole silhouette — the "edge catching the
+        // A thin, near-white rim stroke along the whole silhouette - the "edge catching the
         // light" detail that sells the glass illusion at a glance, even at small sizes.
         g.setStroke(new java.awt.BasicStroke(size * 0.012f));
         g.setColor(new Color(255, 255, 255, 70));
@@ -305,7 +520,7 @@ public final class UIUtils {
     }
 
     /**
-     * Builds a squircle (superellipse) path rather than a plain rounded rectangle — the
+     * Builds a squircle (superellipse) path rather than a plain rounded rectangle - the
      * exact shape Apple's own app icons use, with a flatter mid-edge and a more continuous
      * corner curve than {@link Graphics2D#fillRoundRect} can produce. Generated by sampling
      * the parametric superellipse equation {@code |x/a|^n + |y/b|^n = 1} (with {@code n = 5},
@@ -336,7 +551,7 @@ public final class UIUtils {
     /**
      * The pharmacy-cross glyph itself: a soft dark shadow offset slightly below/right of the
      * white bars, so the cross reads as sitting slightly proud of the glass surface behind
-     * it rather than printed flat onto it — the same "layered, not flat" treatment applied
+     * it rather than printed flat onto it - the same "layered, not flat" treatment applied
      * to the icon's background above.
      */
     private static void drawGlassCross(Graphics2D g, int size) {

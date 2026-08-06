@@ -12,8 +12,8 @@ import com.zugobite.pims.views.AdminDashboardView;
  * service Admin's screens need (medicines, suppliers, users, reports) and hands them all to
  * {@link AdminDashboardView}, which distributes them across its four sidebar screens.
  *
- * <p>Constructing the services here — rather than inside {@link AdminDashboardView} or its
- * individual tab panels — keeps the views package free of any direct knowledge of how to
+ * <p>Constructing the services here - rather than inside {@link AdminDashboardView} or its
+ * individual tab panels - keeps the views package free of any direct knowledge of how to
  * build a service, and means a future test could swap in mock services just by constructing
  * {@link AdminDashboardView} directly instead of going through this controller.</p>
  */

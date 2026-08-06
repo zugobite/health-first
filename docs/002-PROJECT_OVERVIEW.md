@@ -83,7 +83,7 @@ com.zugobite.pims
 │   ├── CashierFormDialog.java                  # Add form for a new Cashier account
 │   ├── ReportsPanel.java                      # Reports tab (all four reports)
 │   ├── PosPanel.java                          # POS screen (search, cart, checkout)
-│   ├── BillView.java                          # Bill window — Print, or Save as PDF
+│   ├── BillView.java                          # Bill window - Print, or Save as PDF
 │   ├── StockCheckPanel.java                   # Price/availability lookup
 │   └── StripedTable.java                      # Shared zebra-striped JTable used by every data table
 │
@@ -166,23 +166,23 @@ For the full requirements specification, see [docs/001-APPLICATION_REQUIREMENTS.
 PLAN.md §6 explicitly calls out "a neatly designed interface" as a grading criterion, so the
 UI layer makes a few deliberate choices beyond plain default-Swing widgets:
 
-- **FlatLaf, not Metal** — `UIUtils.installLookAndFeel()` installs FlatLaf's light theme
+- **FlatLaf, not Metal** - `UIUtils.installLookAndFeel()` installs FlatLaf's light theme
   (`FlatLightLaf`) in place of Java's default "Metal" look, before any component is
   constructed (see `Main.main()`). This alone replaces every button, field, table, and
   scrollbar's rendering app-wide with a modern, flat style, without any other class needing
   to change.
-- **One brand color** — `UIUtils.ACCENT_COLOR` (a medical/pharmacy-appropriate teal) is
+- **One brand color** - `UIUtils.ACCENT_COLOR` (a medical/pharmacy-appropriate teal) is
   passed to FlatLaf as the global accent color, so focus rings, the default-button
   highlight, and selection backgrounds are all derived from a single value. The same color
   drives the login screen's header band and the POS screen's total label.
-- **A branded app icon** — `UIUtils.createAppIcon()` procedurally draws a simple
+- **A branded app icon** - `UIUtils.createAppIcon()` procedurally draws a simple
   rounded-square "pharmacy cross" mark (no bitmap asset to track) that every top-level
   window uses as its title-bar icon (`UIUtils.applyAppIcon`), and that `Main` also sets as
   the OS Dock/taskbar icon where supported.
-- **Consistent, professional data tables** — every `JTable` in the app is a
+- **Consistent, professional data tables** - every `JTable` in the app is a
   `StripedTable`, giving zebra-striped rows, taller row height, and no default grid lines
   app-wide from one shared class. Numeric columns (IDs, prices, quantities) declare their
   real Java type via `getColumnClass()` overrides on the underlying `DefaultTableModel`,
-  which lets Swing's own built-in `Number` renderer right-align them automatically — the
+  which lets Swing's own built-in `Number` renderer right-align them automatically - the
   same convention `ReportExportService`'s PDF/Excel exports use, so what's on screen matches
   what gets exported.

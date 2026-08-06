@@ -10,7 +10,7 @@ import java.util.Optional;
 /**
  * Modal dialog used by {@link ManageUsersPanel} to collect the details for a new Cashier
  * account. There is no "Edit" mode here (only "Add"), because PLAN.md's Admin requirements
- * are "create/delete/manage Cashier accounts" — password resets and username changes are
+ * are "create/delete/manage Cashier accounts" - password resets and username changes are
  * treated as delete-and-recreate for this assignment's scope, so this dialog stays a simple
  * one-shot creation form.
  */
@@ -69,6 +69,7 @@ public class CashierFormDialog extends JDialog {
 
         gbc.gridx = 1;
         gbc.weightx = 1;
+        UIUtils.setPlaceholderOnInput(field, label);
         panel.add(field, gbc);
     }
 
@@ -104,7 +105,7 @@ public class CashierFormDialog extends JDialog {
     /**
      * Plain data holder for the three fields {@link com.zugobite.pims.services.UserService#createCashier}
      * needs. A full {@link com.zugobite.pims.models.User} isn't used here because the
-     * database assigns the user_id via AUTO_INCREMENT — this form never has one to offer.
+     * database assigns the user_id via AUTO_INCREMENT - this form never has one to offer.
      */
     public record CashierInput(String username, String password, String fullName) {
     }

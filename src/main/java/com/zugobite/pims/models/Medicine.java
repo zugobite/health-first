@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
- * A single inventory item — maps 1:1 to a row in the `medicines` table. This is the core
+ * A single inventory item - maps 1:1 to a row in the `medicines` table. This is the core
  * domain object the whole app revolves around: Admin does CRUD on it directly (Manage
  * Medicines tab), Cashier reads its price/stock during checkout (POS + Stock Check), and
  * every report either aggregates or filters on its fields.
  *
  * <p>{@code price} is a {@link BigDecimal} rather than {@code double} to avoid floating-point
- * rounding errors on money — the same reason the `price` and `price_at_sale` columns in
+ * rounding errors on money - the same reason the `price` and `price_at_sale` columns in
  * {@code database.sql} are {@code DECIMAL(10,2)} rather than {@code FLOAT}.</p>
  */
 public class Medicine {

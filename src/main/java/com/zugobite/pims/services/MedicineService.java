@@ -12,17 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Data-access layer for the `medicines` table — CRUD backing Admin's "Manage Medicines" tab,
+ * Data-access layer for the `medicines` table - CRUD backing Admin's "Manage Medicines" tab,
  * plus the read-only lookups used by Cashier's POS search and Stock Check screens
  * ({@link #searchByName}).
  *
- * <p>Note this class does not decrement stock on a sale — that happens inside
+ * <p>Note this class does not decrement stock on a sale - that happens inside
  * {@link SalesService#checkout} as part of the same database transaction as the sale
  * itself, so a checkout and its stock decrement can never partially succeed.</p>
  */
 public class MedicineService {
 
-    /** Every medicine, alphabetical by name — used to populate the full "Manage Medicines" table. */
+    /** Every medicine, alphabetical by name - used to populate the full "Manage Medicines" table. */
     public List<Medicine> getAllMedicines() throws SQLException {
         List<Medicine> medicines = new ArrayList<>();
         String sql = "SELECT * FROM medicines ORDER BY name";
@@ -60,7 +60,7 @@ public class MedicineService {
         return medicines;
     }
 
-    /** Inserts a new medicine. The {@code medicine.getMedicineId()} value is ignored — MySQL
+    /** Inserts a new medicine. The {@code medicine.getMedicineId()} value is ignored - MySQL
      *  assigns the real ID via AUTO_INCREMENT. */
     public void addMedicine(Medicine medicine) throws SQLException {
         String sql = "INSERT INTO medicines (name, company, medicine_type, price, quantity_in_stock, reorder_level, expiry_date, supplier_id) "
@@ -88,7 +88,7 @@ public class MedicineService {
      * Deletes a medicine by ID.
      *
      * @throws SQLException if the `sale_items.medicine_id` foreign key blocks the delete
-     *                       because this medicine appears in past sales — historical sale
+     *                       because this medicine appears in past sales - historical sale
      *                       line items must be preserved
      */
     public void deleteMedicine(int medicineId) throws SQLException {

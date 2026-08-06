@@ -13,7 +13,7 @@ import java.util.List;
  * {@link com.zugobite.pims.services.SalesService#checkout} to be persisted.
  *
  * <p>{@code saleId} and {@code saleDate} start unset (0 / {@code null}) and only become
- * meaningful *after* {@code checkout()} has run — the database assigns the `sale_id` via
+ * meaningful *after* {@code checkout()} has run - the database assigns the `sale_id` via
  * AUTO_INCREMENT and the `sale_date` via {@code DEFAULT CURRENT_TIMESTAMP}, so this object
  * can't know either value up front. {@code SalesService} calls {@link #setSaleId} once it
  * reads back the generated key.</p>

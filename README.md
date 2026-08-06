@@ -1,6 +1,6 @@
-# PIMS — Pharmacy Inventory Management System
+# PIMS - Pharmacy Inventory Management System
 
-A multi-user Java Swing desktop application for a pharmacy ("HealthFirst") that manages inventory, processes sales, and generates business reports — with role-based access (Admin vs. Cashier).
+A multi-user Java Swing desktop application for a pharmacy ("HealthFirst") that manages inventory, processes sales, and generates business reports - with role-based access (Admin vs. Cashier).
 
 [![Java](https://img.shields.io/badge/Java-17+-ED8B00.svg)](https://www.oracle.com/java/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0+-4479A1.svg)](https://www.mysql.com/)
@@ -39,7 +39,7 @@ A multi-user Java Swing desktop application for a pharmacy ("HealthFirst") that 
 - Java Development Kit (JDK) 17 or higher
 - MySQL 8.0 or higher
 - `mysql-connector-j` (JDBC), `pdfbox-app` (PDF generation), Apache POI + its runtime
-  dependencies (Excel generation), and FlatLaf (the modern Look and Feel) on the classpath —
+  dependencies (Excel generation), and FlatLaf (the modern Look and Feel) on the classpath -
   see the full jar list below
 
 ### Installation
@@ -72,7 +72,7 @@ CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:l
 find src -name "*.java" | xargs javac -cp "$CP" -d out
 
 # Run the application
-java -cp "out:$CP" com.zugobite.pims.Main
+java -Xdock:name="HealthFirst PIMS" -cp "out:$CP" com.zugobite.pims.Main
 ```
 
 Default credentials (from seed data): `admin/admin123` (Admin), `cashier/cash123` (Cashier).
@@ -159,7 +159,7 @@ CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:l
 find src -name "*.java" | xargs javac -cp "$CP" -d out
 
 # Run the application
-java -cp "out:$CP" com.zugobite.pims.Main
+java -Xdock:name="HealthFirst PIMS" -cp "out:$CP" com.zugobite.pims.Main
 ```
 
 ### Architecture

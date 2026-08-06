@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * Cashier's "look up a medicine's price/availability without starting a sale" screen
- * (PLAN.md §5.2). Deliberately separate from {@link PosPanel}'s own search box — a Cashier
+ * (PLAN.md §5.2). Deliberately separate from {@link PosPanel}'s own search box - a Cashier
  * answering a customer's "do you have X, how much is it?" question shouldn't need to touch
  * an in-progress cart to do it, and this tab makes that a read-only, side-effect-free action.
  */
@@ -28,7 +28,7 @@ public class StockCheckPanel extends JPanel {
             return false;
         }
 
-        // Price/In Stock are numeric — declaring their real column type right-aligns them
+        // Price/In Stock are numeric - declaring their real column type right-aligns them
         // via Swing's built-in Number renderer (see ManageMedicinesPanel for the explanation).
         @Override
         public Class<?> getColumnClass(int columnIndex) {
@@ -53,19 +53,20 @@ public class StockCheckPanel extends JPanel {
 
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         toolbar.setOpaque(false);
-        toolbar.add(new JLabel("Medicine name:"));
+        toolbar.add(new JLabel("Medicine Name:"));
+        UIUtils.setPlaceholder(searchField, "Medicine Name:");
         toolbar.add(searchField);
         toolbar.add(searchButton);
 
         CardPanel card = new CardPanel(new BorderLayout(0, 12));
         card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         card.add(toolbar, BorderLayout.NORTH);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
+        card.add(UIUtils.createRoundedScrollPane(table), BorderLayout.CENTER);
 
         add(card, BorderLayout.CENTER);
     }
 
-    /** Runs a partial-match search and repopulates the results table — read-only, no cart involved. */
+    /** Runs a partial-match search and repopulates the results table - read-only, no cart involved. */
     private void search() {
         try {
             List<Medicine> results = medicineService.searchByName(searchField.getText().trim());

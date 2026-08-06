@@ -18,6 +18,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import com.zugobite.pims.utils.UIUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,21 +31,21 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Exports any of the four generic reports produced by {@link ReportService} — Sales,
- * Item-Wise, Low Stock, Expiry — to either a paginated PDF or a styled Excel workbook.
+ * Exports any of the four generic reports produced by {@link ReportService} - Sales,
+ * Item-Wise, Low Stock, Expiry - to either a paginated PDF or a styled Excel workbook.
  *
  * <p>Both formats are driven off the exact same input shape {@link ReportService} already
  * returns for its on-screen table ({@link com.zugobite.pims.views.ReportsPanel}):
  * {@code List<Map<String, Object>>}, where every row uses the same ordered set of keys.
  * That genericity is what lets one exporter class handle all four reports without knowing
- * anything about sales, medicines, or suppliers specifically — it only ever deals in column
+ * anything about sales, medicines, or suppliers specifically - it only ever deals in column
  * names and cell values.</p>
  *
  * <p>PDF export is built directly on PDFBox's content-stream API (same approach as
- * {@link ReceiptPdfService}, but with pagination added, since a report — unlike a single
- * bill — can run to any number of rows). Excel export uses Apache POI's {@code XSSFWorkbook}
+ * {@link ReceiptPdfService}, but with pagination added, since a report - unlike a single
+ * bill - can run to any number of rows). Excel export uses Apache POI's {@code XSSFWorkbook}
  * for a real, styled {@code .xlsx} file: bold shaded header row, right-aligned numeric
- * columns with proper numeric/date cell types (not just text), and auto-sized columns —
+ * columns with proper numeric/date cell types (not just text), and auto-sized columns -
  * something a hand-rolled OOXML writer would be much riskier to get right.</p>
  */
 public class ReportExportService {
@@ -186,7 +188,7 @@ public class ReportExportService {
             float textY = y - 8;
             float leftX = MARGIN;
             for (int i = 0; i < columns.size(); i++) {
-                String label = prettifyColumnName(columns.get(i)).toUpperCase();
+                String label = UIUtils.prettifyColumnName(columns.get(i)).toUpperCase();
                 drawText(boldFont, 9, leftX + 4, textY, label);
                 leftX = MARGIN + columnRightX[i];
             }
@@ -241,7 +243,7 @@ public class ReportExportService {
      * report row, with numeric/date cells written as real Excel numeric/date types (not
      * text) so they sort and total correctly if a user pivots or charts them further.
      *
-     * @param title      used as both the sheet name (sanitised — Excel forbids
+     * @param title      used as both the sheet name (sanitised - Excel forbids
      *                   {@code \ / ? * [ ]} and a 31-character limit in sheet names) and the
      *                   worksheet's title row
      * @param rows       the report data, one {@link Map} per row, all sharing the same key order
@@ -274,7 +276,7 @@ public class ReportExportService {
             Row headerRow = sheet.createRow(rowIndex++);
             for (int c = 0; c < columns.size(); c++) {
                 Cell cell = headerRow.createCell(c);
-                cell.setCellValue(prettifyColumnName(columns.get(c)));
+                cell.setCellValue(UIUtils.prettifyColumnName(columns.get(c)));
                 cell.setCellStyle(headerStyle);
             }
 
@@ -299,7 +301,7 @@ public class ReportExportService {
      * Writes one Excel cell, choosing the cell type/style based on the Java type of
      * {@code value}. Written as an {@code instanceof} chain rather than a type-pattern
      * {@code switch} (JEP 441) since that syntax only became a stable, non-preview language
-     * feature in Java 21 — this project targets Java 17+ (see README's Prerequisites), so
+     * feature in Java 21 - this project targets Java 17+ (see README's Prerequisites), so
      * the whole codebase has to stay compilable on a plain Java 17 {@code javac} with no
      * {@code --enable-preview} flag.
      */
@@ -384,26 +386,7 @@ public class ReportExportService {
     // ---------------------------------------------------------------------
 
     /**
-     * Converts a report row's raw map key (camelCase like "totalAmount", or snake_case like
-     * "quantity_in_stock" — {@link ReportService}'s four report queries produce a mix of
-     * both) into a human-readable column header, e.g. "Total Amount" / "Quantity In Stock".
-     */
-    private static String prettifyColumnName(String key) {
-        String spaced = key.replace('_', ' ').replaceAll("([a-z])([A-Z])", "$1 $2");
-        StringBuilder result = new StringBuilder();
-        for (String word : spaced.split("\\s+")) {
-            if (word.isEmpty()) {
-                continue;
-            }
-            result.append(Character.toUpperCase(word.charAt(0)))
-                    .append(word.substring(1).toLowerCase())
-                    .append(' ');
-        }
-        return result.toString().trim();
-    }
-
-    /**
-     * Formats a single report cell value as PDF display text — mirrors the type handling in
+     * Formats a single report cell value as PDF display text - mirrors the type handling in
      * {@link #writeCell}, minus the Excel-specific cell typing. Written as an
      * {@code instanceof} chain rather than a type-pattern {@code switch} for the same
      * Java-17-compatibility reason explained on {@link #writeCell}.

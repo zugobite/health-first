@@ -16,12 +16,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * The Cashier's Point of Sale screen — the app's core workflow (PLAN.md §5.2): search for a
+ * The Cashier's Point of Sale screen - the app's core workflow (PLAN.md §5.2): search for a
  * medicine, add it to a running cart with a quantity, see the live total, and check out.
  *
  * <p>This panel owns the in-progress {@link Sale} object as UI state (the "cart"); it is
  * only handed off to {@link SalesService#checkout} once, at the moment the Cashier clicks
- * "Checkout". Everything before that point — search, add-to-cart, clear-cart — is purely
+ * "Checkout". Everything before that point - search, add-to-cart, clear-cart - is purely
  * local state with zero database writes, so a Cashier can freely browse and adjust the cart
  * without side effects until they actually commit to the sale.</p>
  */
@@ -32,7 +32,7 @@ public class PosPanel extends JPanel {
     private final SalesService salesService;
 
     private final JTextField searchField = new JTextField(20);
-    // ID/Price/In Stock are numeric — declaring their real column type right-aligns them via
+    // ID/Price/In Stock are numeric - declaring their real column type right-aligns them via
     // Swing's built-in Number renderer (see ManageMedicinesPanel for the full explanation).
     private final DefaultTableModel searchResultsModel = new DefaultTableModel(new Object[]{"ID", "Name", "Price", "In Stock"}, 0) {
         @Override
@@ -46,7 +46,7 @@ public class PosPanel extends JPanel {
     };
     private final JTable searchResultsTable = new StripedTable(searchResultsModel);
 
-    private final DefaultTableModel cartModel = new DefaultTableModel(new Object[]{"ID", "Name", "Qty", "Price", "Line Total"}, 0) {
+    private final DefaultTableModel cartModel = new DefaultTableModel(new Object[]{"ID", "Name", "Quantity", "Price", "Line Total"}, 0) {
         @Override
         public Class<?> getColumnClass(int columnIndex) {
             return switch (columnIndex) {
@@ -59,7 +59,7 @@ public class PosPanel extends JPanel {
     private final JTable cartTable = new StripedTable(cartModel);
     private final JLabel totalLabel = new JLabel("Total: R0.00");
 
-    // The in-progress cart. Reassigned (not mutated in place) by clearCart() — see that
+    // The in-progress cart. Reassigned (not mutated in place) by clearCart() - see that
     // method's comment for why a fresh Sale is created rather than emptying the old one.
     private Sale currentSale;
 
@@ -83,7 +83,8 @@ public class PosPanel extends JPanel {
 
         JPanel searchToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         searchToolbar.setOpaque(false);
-        searchToolbar.add(new JLabel("Medicine name:"));
+        searchToolbar.add(new JLabel("Medicine Name:"));
+        UIUtils.setPlaceholder(searchField, "Medicine Name:");
         searchToolbar.add(searchField);
         searchToolbar.add(searchButton);
         searchToolbar.add(addToCartButton);
@@ -91,12 +92,12 @@ public class PosPanel extends JPanel {
         CardPanel searchCard = new CardPanel(new BorderLayout(0, 12));
         searchCard.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         searchCard.add(searchToolbar, BorderLayout.NORTH);
-        searchCard.add(new JScrollPane(searchResultsTable), BorderLayout.CENTER);
+        searchCard.add(UIUtils.createRoundedScrollPane(searchResultsTable), BorderLayout.CENTER);
 
         // Bottom card: the cart itself, its running total, and the Clear/Checkout actions.
         // The running total is the single most important number on this screen, so it gets
         // a visibly larger, bolder, accent-colored treatment rather than blending in as
-        // just another label — the same "make the total impossible to miss" convention
+        // just another label - the same "make the total impossible to miss" convention
         // real point-of-sale software follows.
         totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD, 18f));
         totalLabel.setForeground(UIUtils.ACCENT_COLOR);
@@ -120,7 +121,7 @@ public class PosPanel extends JPanel {
 
         CardPanel cartCard = new CardPanel(new BorderLayout(0, 12));
         cartCard.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        cartCard.add(new JScrollPane(cartTable), BorderLayout.CENTER);
+        cartCard.add(UIUtils.createRoundedScrollPane(cartTable), BorderLayout.CENTER);
         cartCard.add(cartFooter, BorderLayout.SOUTH);
 
         // Split pane lets the Cashier resize search-results vs. cart space to taste.
@@ -176,7 +177,7 @@ public class PosPanel extends JPanel {
     /**
      * PLAN.md §5.2's "Clear cart" action. Starts a brand-new {@link Sale} rather than
      * emptying {@code currentSale.getItems()} in place, since {@code Sale} has no
-     * "removeAllItems" method — its {@code addItem()}-only API keeps the running total
+     * "removeAllItems" method - its {@code addItem()}-only API keeps the running total
      * always consistent with its item list by construction, so the simplest way to reset
      * both together is to just replace the whole object.
      */
@@ -188,7 +189,7 @@ public class PosPanel extends JPanel {
 
     /**
      * Commits the cart: hands {@link #currentSale} to {@link SalesService#checkout} (which
-     * persists it as a single DB transaction — sale header, line items, and stock decrement
+     * persists it as a single DB transaction - sale header, line items, and stock decrement
      * all together), then opens the generated {@link BillView} and resets the cart for the
      * next customer.
      */
@@ -201,7 +202,7 @@ public class PosPanel extends JPanel {
             salesService.checkout(currentSale);
             // By this point currentSale.getSaleId() and .getSaleDate() have been populated
             // by checkout(), so the bill can reference the real, persisted sale number and
-            // timestamp — and, via `cashier`, name whoever processed it on the PDF receipt.
+            // timestamp - and, via `cashier`, name whoever processed it on the PDF receipt.
             new BillView(currentSale, cashier).setVisible(true);
             clearCart();
         } catch (SQLException e) {

@@ -12,7 +12,7 @@ import com.zugobite.pims.views.CashierDashboardView;
  *
  * <p>Notably absent: {@link com.zugobite.pims.services.SupplierService},
  * {@link com.zugobite.pims.services.UserService}, and
- * {@link com.zugobite.pims.services.ReportService} — a Cashier session simply never
+ * {@link com.zugobite.pims.services.ReportService} - a Cashier session simply never
  * constructs them, which is a cheap but effective way of keeping "Cashier UI must not
  * expose add/edit/delete for medicines" (PLAN.md §5.2) true: the Cashier-side views have no
  * service reference that would even let them attempt a medicine CRUD call.</p>

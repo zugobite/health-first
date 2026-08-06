@@ -35,7 +35,7 @@ public class ManageSuppliersPanel extends JPanel {
             return false;
         }
 
-        // ID is the only numeric column here — declaring its real type right-aligns it via
+        // ID is the only numeric column here - declaring its real type right-aligns it via
         // Swing's built-in Number renderer (see ManageMedicinesPanel for the full explanation).
         @Override
         public Class<?> getColumnClass(int columnIndex) {
@@ -74,7 +74,7 @@ public class ManageSuppliersPanel extends JPanel {
         CardPanel card = new CardPanel(new BorderLayout(0, 12));
         card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         card.add(toolbar, BorderLayout.NORTH);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
+        card.add(UIUtils.createRoundedScrollPane(table), BorderLayout.CENTER);
 
         add(card, BorderLayout.CENTER);
 
@@ -101,13 +101,13 @@ public class ManageSuppliersPanel extends JPanel {
     /** Opens a blank {@link SupplierFormDialog}; on confirmation, inserts and refreshes the table. */
     private void openAddDialog() {
         SupplierFormDialog dialog = new SupplierFormDialog(ownerFrame(), null);
-        // setVisible(true) blocks here because the dialog is modal — by the time it
+        // setVisible(true) blocks here because the dialog is modal - by the time it
         // returns, the user has already clicked OK/Cancel or closed the window.
         dialog.setVisible(true);
 
         Optional<Supplier> newSupplier = dialog.getResult();
         if (newSupplier.isEmpty()) {
-            // User cancelled — nothing to persist.
+            // User cancelled - nothing to persist.
             return;
         }
 

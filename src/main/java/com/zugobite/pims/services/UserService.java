@@ -15,11 +15,11 @@ import java.util.Optional;
 /**
  * Data-access layer for the `users` table: login authentication plus Admin's Cashier
  * account management (create/list/delete). Every method opens and closes its own JDBC
- * {@link Connection} via {@link DBConnection} — there is no persistent connection or
+ * {@link Connection} via {@link DBConnection} - there is no persistent connection or
  * connection pool, which is fine for this single-user desktop app.
  *
  * <p>All queries use {@link PreparedStatement} with bound parameters rather than string
- * concatenation, per PLAN.md §6's explicit requirement ("especially for login") — this is
+ * concatenation, per PLAN.md §6's explicit requirement ("especially for login") - this is
  * what prevents SQL injection via a crafted username/password at the login screen.</p>
  */
 public class UserService {
@@ -27,7 +27,7 @@ public class UserService {
     /**
      * Checks a username/password pair against the `users` table and, on a match, returns
      * the corresponding {@link User} (role included, so the caller can route to the right
-     * dashboard). Returns {@link Optional#empty()} — not an exception — when the credentials
+     * dashboard). Returns {@link Optional#empty()} - not an exception - when the credentials
      * simply don't match, since a failed login is expected user behavior, not an error
      * condition; {@link SQLException} is reserved for actual database/connectivity failures.
      *
@@ -35,7 +35,7 @@ public class UserService {
      * sample seed credentials (`admin123`, `cash123`) are plaintext and the assignment
      * explicitly allows this baseline. Upgrading to hashed passwords (e.g. BCrypt) would
      * only require changing this one query to fetch the stored hash and verify it, plus
-     * updating {@code database.sql}'s seed INSERTs — no other class depends on the storage
+     * updating {@code database.sql}'s seed INSERTs - no other class depends on the storage
      * format.</p>
      */
     public Optional<User> authenticate(String username, String password) throws SQLException {
@@ -59,7 +59,7 @@ public class UserService {
     /**
      * Lists every Cashier account for {@link com.zugobite.pims.views.ManageUsersPanel}.
      * Deliberately filtered to {@code role = 'Cashier'} so the Admin account itself never
-     * shows up in — and therefore can never be accidentally deleted from — this screen.
+     * shows up in - and therefore can never be accidentally deleted from - this screen.
      */
     public List<User> getCashiers() throws SQLException {
         List<User> cashiers = new ArrayList<>();
@@ -76,7 +76,7 @@ public class UserService {
 
     /**
      * Inserts a new Cashier account. The role is hardcoded to {@code 'Cashier'} in the SQL
-     * itself (not a parameter) — this method has no way to create an Admin account, which is
+     * itself (not a parameter) - this method has no way to create an Admin account, which is
      * intentional: PLAN.md scopes Admin's user management to Cashier accounts only.
      *
      * @throws SQLException if, among other causes, {@code username} collides with the
@@ -97,7 +97,7 @@ public class UserService {
      * Deletes a user account by ID.
      *
      * @throws SQLException if the `sales.user_id` foreign key blocks the delete because this
-     *                       user has processed sales in the past — those historical sales
+     *                       user has processed sales in the past - those historical sales
      *                       records must be preserved, so the schema won't let the cashier
      *                       who created them be removed while they're still referenced
      */

@@ -4,7 +4,7 @@ import com.zugobite.pims.enums.Role;
 
 /**
  * A logged-in account: either the pharmacy's Admin or one of its Cashiers. Maps 1:1 to a
- * row in the `users` table (see {@code database.sql}), minus the password — a {@code User}
+ * row in the `users` table (see {@code database.sql}), minus the password - a {@code User}
  * only ever exists in memory *after* successful authentication, so there is never a reason
  * to carry the password hash/plaintext around once the login check has already happened.
  *

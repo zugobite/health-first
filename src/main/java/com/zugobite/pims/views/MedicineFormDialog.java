@@ -125,6 +125,7 @@ public class MedicineFormDialog extends JDialog {
 
         gbc.gridx = 1;
         gbc.weightx = 1;
+        UIUtils.setPlaceholderOnInput(field, label);
         panel.add(field, gbc);
     }
 

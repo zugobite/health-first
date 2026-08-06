@@ -1,14 +1,14 @@
 package com.zugobite.pims.models;
 
 /**
- * A pharmaceutical supplier — maps 1:1 to a row in the `suppliers` table. Every
+ * A pharmaceutical supplier - maps 1:1 to a row in the `suppliers` table. Every
  * {@link Medicine} links back to exactly one {@code Supplier} via {@code supplier_id}, which
  * is why the schema forbids deleting a supplier that's still referenced by a medicine (see
  * the `FOREIGN KEY` in {@code database.sql}, and the resulting error surfaced in
  * {@code ManageSuppliersPanel.deleteSelected()}).
  *
  * <p>Mutable (unlike {@link User}) because Admin needs to edit an existing supplier's
- * details in place via {@link com.zugobite.pims.views.SupplierFormDialog} — that dialog
+ * details in place via {@link com.zugobite.pims.views.SupplierFormDialog} - that dialog
  * builds a fresh {@code Supplier} from the form fields rather than mutating one in place,
  * but the setters exist for callers who do want to mutate a loaded instance directly.</p>
  */
@@ -76,7 +76,7 @@ public class Supplier {
 
     /**
      * Used by Swing's {@link javax.swing.JComboBox} to render this supplier as just its name
-     * in the dropdown on {@link com.zugobite.pims.views.MedicineFormDialog} — without this
+     * in the dropdown on {@link com.zugobite.pims.views.MedicineFormDialog} - without this
      * override, the combo box would fall back to the default {@code Object.toString()} and
      * show something unreadable like {@code Supplier@1a2b3c}.
      */

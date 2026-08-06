@@ -1,4 +1,4 @@
--- PIMS (HealthFirst) — schema + seed data
+-- PIMS (HealthFirst) - schema + seed data
 -- Load with: mysql -u root -p < database.sql
 
 CREATE DATABASE IF NOT EXISTS pims_db;

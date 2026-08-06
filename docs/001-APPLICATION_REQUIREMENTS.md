@@ -82,21 +82,21 @@ Admin has full CRUD on medicines and suppliers, including expiry date and suppli
 
 Four reports are required:
 
-- **Sales report** — transactions over a date range
-- **Item-Wise report** — sales aggregated per medicine (quantity sold, revenue)
-- **Low Stock report** — medicines where `quantity_in_stock <= reorder_level`
-- **Expiry report** — medicines expiring within the next 1 month from the current date
+- **Sales report** - transactions over a date range
+- **Item-Wise report** - sales aggregated per medicine (quantity sold, revenue)
+- **Low Stock report** - medicines where `quantity_in_stock <= reorder_level`
+- **Expiry report** - medicines expiring within the next 1 month from the current date
 
 ## 3. Non-Functional Requirements
 
 - Clean, consistently spaced/aligned Swing layout with readable tables
-- All SQL access via `PreparedStatement` — no string-concatenated SQL, especially for login
+- All SQL access via `PreparedStatement` - no string-concatenated SQL, especially for login
 - Passwords hashed if going beyond baseline requirements
 
 ## 4. Deliverables
 
-- `zasciahugo_pims.exe` — bundled executable + MySQL DB for easy testing
-- `/src` — all `.java` source files
-- `database.sql` — full CREATE DATABASE / CREATE TABLE / INSERT (seed) script
-- `/screenshots` — Login screen; Admin Dashboard; Manage Medicines tab with data; Cashier POS with items in cart; generated Bill window; all four reports
-- `README.txt` — user manual + default credentials
+- `zasciahugo_pims.exe` - bundled executable + MySQL DB for easy testing
+- `/src` - all `.java` source files
+- `database.sql` - full CREATE DATABASE / CREATE TABLE / INSERT (seed) script
+- `/screenshots` - Login screen; Admin Dashboard; Manage Medicines tab with data; Cashier POS with items in cart; generated Bill window; all four reports
+- `README.txt` - user manual + default credentials

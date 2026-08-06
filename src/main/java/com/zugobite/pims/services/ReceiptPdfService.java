@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * Renders a completed {@link Sale} as a professionally laid-out, single-page A4 PDF receipt
- * — the "save" half of PLAN.md §5.2's "support print and/or save" bill requirement
+ * - the "save" half of PLAN.md §5.2's "support print and/or save" bill requirement
  * ({@link com.zugobite.pims.views.BillView}'s "Print" button already covers the "print"
  * half via Swing's built-in print pipeline).
  *
@@ -30,7 +30,7 @@ import java.util.List;
  * with this assignment's deliverable without any copyleft licensing complications.</p>
  *
  * <p>Uses only the 14 standard PDF fonts (Helvetica / Helvetica-Bold) rather than an
- * embedded custom font — those render identically in every PDF viewer with zero embedding
+ * embedded custom font - those render identically in every PDF viewer with zero embedding
  * overhead, which keeps the generated file small and avoids any font-licensing questions.</p>
  */
 public class ReceiptPdfService {
@@ -46,7 +46,7 @@ public class ReceiptPdfService {
     // remaining space; the other three are fixed-width and right-aligned since they're all
     // numeric (quantity/currency reads far more naturally right-aligned than left-aligned).
     // The PRICE/TOTAL gap in particular needs to comfortably clear each header label's
-    // rendered width at HELVETICA_BOLD 10pt (~45-50pt for "PRICE"/"TOTAL") — a narrower gap
+    // rendered width at HELVETICA_BOLD 10pt (~45-50pt for "PRICE"/"TOTAL") - a narrower gap
     // here previously let the two right-aligned headers overlap into unreadable text.
     private static final float COL_ITEM_X = 0f;
     private static final float COL_QTY_RIGHT_X = 300f;
@@ -58,7 +58,7 @@ public class ReceiptPdfService {
     /**
      * Renders {@code sale} to {@code outputFile} as a one-page PDF receipt.
      *
-     * @param sale    the completed, already-checked-out sale to render — its saleId and
+     * @param sale    the completed, already-checked-out sale to render - its saleId and
      *                saleDate must already be populated (i.e. this is called *after*
      *                {@link SalesService#checkout}, never before)
      * @param cashier the cashier who processed the sale, shown in the receipt's "Served by"
@@ -77,7 +77,7 @@ public class ReceiptPdfService {
             try (PDPageContentStream content = new PDPageContentStream(document, page)) {
                 // Cursor tracks the current baseline y-position as we draw top-to-bottom, so
                 // each drawing helper below can just report how much vertical space it used
-                // and the caller advances the cursor by that amount — avoids hardcoding an
+                // and the caller advances the cursor by that amount - avoids hardcoding an
                 // absolute y-coordinate for every single line on the page.
                 float cursorY = PAGE_HEIGHT - MARGIN;
 
@@ -96,7 +96,7 @@ public class ReceiptPdfService {
     private float drawHeader(PDPageContentStream content, PDFont boldFont, PDFont regularFont, float cursorY) throws IOException {
         drawText(content, boldFont, 22, MARGIN, cursorY, "HealthFirst Pharmacy");
         cursorY -= 18;
-        drawText(content, regularFont, 10, MARGIN, cursorY, "Pharmacy Inventory Management System — Official Receipt");
+        drawText(content, regularFont, 10, MARGIN, cursorY, "Pharmacy Inventory Management System - Official Receipt");
         cursorY -= 14;
         drawRule(content, cursorY);
         return cursorY - 26;
@@ -104,7 +104,7 @@ public class ReceiptPdfService {
 
     /**
      * Two-column metadata block: sale number/date on the left, the cashier who served the
-     * customer on the right — mirrors the "receipt number + date" / "served by" layout of a
+     * customer on the right - mirrors the "receipt number + date" / "served by" layout of a
      * typical retail till slip.
      */
     private float drawSaleInfo(PDPageContentStream content, PDFont regularFont, PDFont boldFont,
@@ -118,12 +118,12 @@ public class ReceiptPdfService {
         cursorY -= 14;
         drawText(content, boldFont, valueSize, MARGIN, cursorY, "#" + sale.getSaleId());
         drawText(content, boldFont, valueSize, rightColumnX, cursorY,
-                cashier != null ? cashier.getFullName() : "—");
+                cashier != null ? cashier.getFullName() : "-");
         cursorY -= 20;
 
         drawText(content, regularFont, labelSize, MARGIN, cursorY, "DATE & TIME");
         cursorY -= 14;
-        String dateText = sale.getSaleDate() != null ? sale.getSaleDate().format(DATE_FORMAT) : "—";
+        String dateText = sale.getSaleDate() != null ? sale.getSaleDate().format(DATE_FORMAT) : "-";
         drawText(content, boldFont, valueSize, MARGIN, cursorY, dateText);
         cursorY -= 24;
 
@@ -204,7 +204,7 @@ public class ReceiptPdfService {
     }
 
     /**
-     * Right-aligned text whose right edge lands exactly at {@code rightX} — computed by
+     * Right-aligned text whose right edge lands exactly at {@code rightX} - computed by
      * measuring the string's width in the given font and shifting the start position left
      * by that amount before drawing. This is what keeps the QTY/UNIT PRICE/LINE TOTAL
      * columns visually aligned as a column, regardless of how many digits each value has.
@@ -214,7 +214,7 @@ public class ReceiptPdfService {
         drawText(content, font, size, rightX - textWidth, y, text);
     }
 
-    /** Horizontally centered text around {@code centerX} — used for the footer's closing lines. */
+    /** Horizontally centered text around {@code centerX} - used for the footer's closing lines. */
     private void drawCentered(PDPageContentStream content, PDFont font, float size, float centerX, float y, String text) throws IOException {
         float textWidth = font.getStringWidth(text) / 1000 * size;
         drawText(content, font, size, centerX - textWidth / 2, y, text);

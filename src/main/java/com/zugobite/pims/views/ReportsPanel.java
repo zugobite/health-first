@@ -20,7 +20,7 @@ import java.util.Map;
  * (PLAN.md §5.4) by re-purposing one generic table for whichever report is currently
  * selected, rather than building four separate hardcoded tab panels. This works because
  * {@link ReportService}'s report methods all return the same generic
- * {@code List<Map<String, Object>>} shape — see {@link #populateTable} for how that's turned
+ * {@code List<Map<String, Object>>} shape - see {@link #populateTable} for how that's turned
  * into a table's columns/rows on the fly, and see {@link ReportExportService} for how the
  * same generic shape is reused again to drive the "Export to PDF"/"Export to Excel" buttons.
  */
@@ -34,7 +34,7 @@ public class ReportsPanel extends JPanel {
     // columnClasses is kept in step with the current column set so numeric columns (any
     // report might have several, e.g. Sales' totalAmount or Low Stock's two int columns)
     // render right-aligned via Swing's built-in Number renderer, the same as every other
-    // table in the app — see ManageMedicinesPanel for the full explanation of the mechanism.
+    // table in the app - see ManageMedicinesPanel for the full explanation of the mechanism.
     private Class<?>[] columnClasses = new Class<?>[0];
     private final DefaultTableModel tableModel = new DefaultTableModel() {
         @Override
@@ -48,7 +48,7 @@ public class ReportsPanel extends JPanel {
     );
 
     // The data behind whatever's currently on screen, kept around so the Export buttons can
-    // hand the exact same rows to ReportExportService without re-querying the database —
+    // hand the exact same rows to ReportExportService without re-querying the database -
     // what the user sees in the table is guaranteed to be what gets exported. Null until the
     // first successful "Run Report" click.
     private List<Map<String, Object>> lastRows;
@@ -81,7 +81,7 @@ public class ReportsPanel extends JPanel {
         CardPanel card = new CardPanel(new BorderLayout(0, 12));
         card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         card.add(toolbar, BorderLayout.NORTH);
-        card.add(new JScrollPane(table), BorderLayout.CENTER);
+        card.add(UIUtils.createRoundedScrollPane(table), BorderLayout.CENTER);
 
         add(card, BorderLayout.CENTER);
     }
@@ -89,7 +89,7 @@ public class ReportsPanel extends JPanel {
     /**
      * Calls whichever {@link ReportService} method matches the selected dropdown entry, then
      * hands the result to {@link #populateTable}. The Sales Report is hardcoded to the last
-     * month as a reasonable default range — PLAN.md doesn't specify a UI for picking a custom
+     * month as a reasonable default range - PLAN.md doesn't specify a UI for picking a custom
      * date range, so "the last month" keeps the report immediately useful without extra
      * date-picker fields.
      */
@@ -112,10 +112,10 @@ public class ReportsPanel extends JPanel {
 
     /**
      * Rebuilds the table's columns and rows from a generic report result. Column headers are
-     * taken from the first row's map keys (every row within a single report has the same
-     * keys, since they all come from the same SQL query), and each row's values are appended
-     * in that same key order. If the report is empty, the table is simply cleared with no
-     * columns — an empty Low Stock or Expiry report genuinely has nothing to show.
+     * human-readable labels derived from the first row's map keys (every row within a single
+     * report has the same keys, since they all come from the same SQL query), and each row's
+     * values are appended in that same key order. If the report is empty, the table is simply
+     * cleared with no columns - an empty Low Stock or Expiry report genuinely has nothing to show.
      */
     private void populateTable(List<Map<String, Object>> rows) {
         tableModel.setDataVector(new Object[][]{}, new Object[]{});
@@ -124,11 +124,13 @@ public class ReportsPanel extends JPanel {
             return;
         }
         Map<String, Object> firstRow = rows.get(0);
-        Object[] columns = firstRow.keySet().toArray();
+        Object[] columns = firstRow.keySet().stream()
+                .map(UIUtils::prettifyColumnName)
+                .toArray();
         tableModel.setColumnIdentifiers(columns);
 
         // Each column's class comes from the actual runtime type of that column's first
-        // value (Integer/BigDecimal ⇒ right-aligned; String/Timestamp/Date ⇒ left-aligned) —
+        // value (Integer/BigDecimal ⇒ right-aligned; String/Timestamp/Date ⇒ left-aligned) -
         // the same type-detection approach ReportExportService uses for its PDF/Excel column
         // alignment, kept in sync here so the on-screen table and the exported files agree.
         columnClasses = firstRow.values().stream()
@@ -143,7 +145,7 @@ public class ReportsPanel extends JPanel {
     /**
      * Prompts for a save location (defaulting to a filename derived from the report title
      * and the chosen format) and delegates the actual rendering to
-     * {@link ReportExportService}. Requires a report to have been run first — exporting
+     * {@link ReportExportService}. Requires a report to have been run first - exporting
      * "whatever's currently on screen" doesn't make sense before anything has been run.
      */
     private void exportReport(ExportFormat format) {

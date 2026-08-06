@@ -14,7 +14,7 @@ import java.sql.SQLException;
  * <p><b>Maintainer note:</b> {@code URL}/{@code USER}/{@code PASSWORD} are hardcoded here for
  * assignment simplicity (PLAN.md targets a local MySQL instance for grading). In a real
  * deployment these would come from an external config file or environment variables instead
- * of being committed to source — see the {@code db.properties} / {@code *.env} entries
+ * of being committed to source - see the {@code db.properties} / {@code *.env} entries
  * already reserved in {@code .gitignore} for that future step.</p>
  *
  * <p>No connection pooling is used: each call opens a fresh {@link Connection}, and every
@@ -34,7 +34,7 @@ public final class DBConnection {
 
     /**
      * Opens a brand-new connection to {@code pims_db}. Callers are responsible for closing
-     * it — always via try-with-resources, e.g.:
+     * it - always via try-with-resources, e.g.:
      * <pre>{@code
      * try (Connection conn = DBConnection.getConnection();
      *      PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -44,7 +44,7 @@ public final class DBConnection {
      *
      * @throws SQLException if the JDBC driver can't reach MySQL (wrong host/port, DB not
      *                       running, wrong credentials, database not yet created via
-     *                       {@code database.sql}, etc.) — deliberately not caught here so
+     *                       {@code database.sql}, etc.) - deliberately not caught here so
      *                       callers can surface a meaningful error to the user instead of
      *                       this class swallowing it.
      */

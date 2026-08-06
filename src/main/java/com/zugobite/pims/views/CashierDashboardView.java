@@ -12,8 +12,8 @@ import java.util.List;
 
 /**
  * The Cashier's main window: a left sidebar (see {@link SidebarNav}) for switching between
- * the two screens PLAN.md §5.2 requires — Point of Sale (search/cart/checkout/bill) and a
- * standalone Stock Check lookup — with the selected one shown in a {@link CardLayout}
+ * the two screens PLAN.md §5.2 requires - Point of Sale (search/cart/checkout/bill) and a
+ * standalone Stock Check lookup - with the selected one shown in a {@link CardLayout}
  * content area. No Manage Medicines/Suppliers/Users/Reports screens exist here at all, which
  * is how "Cashier UI must not expose add/edit/delete for medicines" is enforced: those
  * screens are simply never constructed for a Cashier session.
@@ -23,8 +23,8 @@ public class CashierDashboardView extends JFrame {
     private static final List<String> NAV_LABELS = List.of("Point of Sale", "Stock Check");
 
     public CashierDashboardView(User cashier, MedicineService medicineService, SalesService salesService, Runnable onLogout) {
-        super("HealthFirst PIMS — Cashier POS (" + cashier.getFullName() + ")");
-        // Closing this window via the titlebar button quits the app, same as LoginView —
+        super("HealthFirst PIMS - Cashier POS (" + cashier.getFullName() + ")");
+        // Closing this window via the titlebar button quits the app, same as LoginView -
         // see that class's comment for why. Logging out is the separate, non-quitting path
         // provided by the sidebar's "Log Out" button (see SidebarNav).
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

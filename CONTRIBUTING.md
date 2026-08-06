@@ -80,7 +80,7 @@ cd health-first
 # 2. Load the schema and seed data
 mysql -u root -p < database.sql
 
-# 3. Fetch the runtime jars into lib/ — see the full curl commands in
+# 3. Fetch the runtime jars into lib/ - see the full curl commands in
 #    README.md#installation (JDBC driver, PDFBox, and Apache POI + dependencies)
 
 CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:lib/poi-ooxml-lite.jar:lib/xmlbeans.jar:lib/commons-compress.jar:lib/commons-io.jar:lib/commons-collections4.jar:lib/log4j-api.jar:lib/flatlaf.jar"
@@ -89,7 +89,7 @@ CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:l
 find src -name "*.java" | xargs javac -cp "$CP" -d out
 
 # 5. Run the application
-java -cp "out:$CP" com.zugobite.pims.Main
+java -Xdock:name="HealthFirst PIMS" -cp "out:$CP" com.zugobite.pims.Main
 ```
 
 ### Project Structure
