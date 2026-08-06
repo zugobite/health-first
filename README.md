@@ -12,11 +12,12 @@ A multi-user Java Swing desktop application for a pharmacy ("HealthFirst") that 
 - **Inventory Management** - Full CRUD on medicines and suppliers, including expiry date and supplier link
 - **Point of Sale** - Search medicines, build a cart, calculate totals from live prices, checkout in a single transaction
 - **Stock Control** - Automatic `quantity_in_stock` decrement on checkout, low-stock alerting via reorder level
-- **Bill Generation** - Printable/savable bill window after checkout
+- **Bill Generation** - Bill window after checkout with both "Print" (Swing's built-in print pipeline) and "Save as PDF" (a professionally typeset PDF receipt via Apache PDFBox)
 - **User Management** - Admin creates and manages Cashier accounts
-- **Reporting** - Sales, Item-Wise, Low Stock, and Expiry (next 30 days) reports
+- **Account Menu** - View your own profile and log out to switch users without restarting the app
+- **Reporting** - Sales, Item-Wise, Low Stock, and Expiry (next 30 days) reports, each exportable to a paginated PDF or a styled Excel workbook
 - **JDBC + MySQL** - `PreparedStatement`-based data access throughout, no string-concatenated SQL
-- **Clean Swing UI** - Consistent spacing/alignment and readable tables
+- **Modern, Branded UI** - FlatLaf-based flat design with a HealthFirst teal accent color, a branded app icon, striped/right-aligned data tables, and consistent spacing throughout
 
 ## Table of Contents
 
@@ -37,7 +38,9 @@ A multi-user Java Swing desktop application for a pharmacy ("HealthFirst") that 
 
 - Java Development Kit (JDK) 17 or higher
 - MySQL 8.0 or higher
-- `mysql-connector-j` JDBC driver on the classpath
+- `mysql-connector-j` (JDBC), `pdfbox-app` (PDF generation), Apache POI + its runtime
+  dependencies (Excel generation), and FlatLaf (the modern Look and Feel) on the classpath —
+  see the full jar list below
 
 ### Installation
 
@@ -49,11 +52,27 @@ cd health-first
 # Load the schema and seed data
 mysql -u root -p < database.sql
 
+# Fetch the runtime jars into lib/
+mkdir -p lib
+curl -sL -o lib/mysql-connector-j.jar https://repo1.maven.org/maven2/com/mysql/mysql-connector-j/8.4.0/mysql-connector-j-8.4.0.jar
+curl -sL -o lib/pdfbox-app.jar https://repo1.maven.org/maven2/org/apache/pdfbox/pdfbox-app/3.0.8/pdfbox-app-3.0.8.jar
+curl -sL -o lib/poi.jar https://repo1.maven.org/maven2/org/apache/poi/poi/5.5.1/poi-5.5.1.jar
+curl -sL -o lib/poi-ooxml.jar https://repo1.maven.org/maven2/org/apache/poi/poi-ooxml/5.5.1/poi-ooxml-5.5.1.jar
+curl -sL -o lib/poi-ooxml-lite.jar https://repo1.maven.org/maven2/org/apache/poi/poi-ooxml-lite/5.5.1/poi-ooxml-lite-5.5.1.jar
+curl -sL -o lib/xmlbeans.jar https://repo1.maven.org/maven2/org/apache/xmlbeans/xmlbeans/5.3.0/xmlbeans-5.3.0.jar
+curl -sL -o lib/commons-compress.jar https://repo1.maven.org/maven2/org/apache/commons/commons-compress/1.28.0/commons-compress-1.28.0.jar
+curl -sL -o lib/commons-io.jar https://repo1.maven.org/maven2/commons-io/commons-io/2.21.0/commons-io-2.21.0.jar
+curl -sL -o lib/commons-collections4.jar https://repo1.maven.org/maven2/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0.jar
+curl -sL -o lib/log4j-api.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.24.3/log4j-api-2.24.3.jar
+curl -sL -o lib/flatlaf.jar https://repo1.maven.org/maven2/com/formdev/flatlaf/3.7.2/flatlaf-3.7.2.jar
+
+CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:lib/poi-ooxml-lite.jar:lib/xmlbeans.jar:lib/commons-compress.jar:lib/commons-io.jar:lib/commons-collections4.jar:lib/log4j-api.jar:lib/flatlaf.jar"
+
 # Compile all Java source files
-find src -name "*.java" | xargs javac -cp mysql-connector-j.jar -d out
+find src -name "*.java" | xargs javac -cp "$CP" -d out
 
 # Run the application
-java -cp out:mysql-connector-j.jar com.zugobite.pims.Main
+java -cp "out:$CP" com.zugobite.pims.Main
 ```
 
 Default credentials (from seed data): `admin/admin123` (Admin), `cashier/cash123` (Cashier).
@@ -103,15 +122,18 @@ health-first/
 │   │   ├── MedicineService.java        # Medicine CRUD, low-stock/expiry queries
 │   │   ├── SupplierService.java        # Supplier CRUD
 │   │   ├── SalesService.java           # Cart checkout transaction
-│   │   └── ReportService.java          # Sales / Item-Wise / Low Stock / Expiry reports
+│   │   ├── ReportService.java          # Sales / Item-Wise / Low Stock / Expiry reports
+│   │   ├── ReceiptPdfService.java      # Renders a Sale as a typeset PDF receipt (Apache PDFBox)
+│   │   └── ReportExportService.java    # Exports any report to paginated PDF or styled Excel (POI)
 │   ├── controllers/
-│   │   ├── LoginController.java        # Authentication & role routing
+│   │   ├── LoginController.java        # Authentication, role routing, and logout
 │   │   ├── AdminController.java        # Admin dashboard wiring
 │   │   └── CashierController.java      # Cashier dashboard wiring
-│   ├── views/                          # Swing screens (Login, dashboards, POS, reports)
+│   ├── views/                          # Swing screens (Login, dashboards, POS, bill, reports, Account menu)
+│   │   └── StripedTable.java           # Shared zebra-striped JTable used by every data table
 │   └── utils/
 │       ├── InputValidator.java         # Input validation helpers
-│       └── UIUtils.java                # Swing layout/formatting helpers
+│       └── UIUtils.java                # Look and feel, brand color/icon, layout helpers
 ├── data/                               # Runtime data directory
 ├── docs/                               # Developer documentation
 │   ├── 001-APPLICATION_REQUIREMENTS.md
@@ -131,11 +153,13 @@ See [docs/002-PROJECT_OVERVIEW.md](docs/002-PROJECT_OVERVIEW.md) for the complet
 ## Development
 
 ```bash
+CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:lib/poi-ooxml-lite.jar:lib/xmlbeans.jar:lib/commons-compress.jar:lib/commons-io.jar:lib/commons-collections4.jar:lib/log4j-api.jar:lib/flatlaf.jar"
+
 # Compile all source files
-find src -name "*.java" | xargs javac -cp mysql-connector-j.jar -d out
+find src -name "*.java" | xargs javac -cp "$CP" -d out
 
 # Run the application
-java -cp out:mysql-connector-j.jar com.zugobite.pims.Main
+java -cp "out:$CP" com.zugobite.pims.Main
 ```
 
 ### Architecture

@@ -20,17 +20,26 @@ import com.zugobite.pims.views.AdminDashboardView;
 public class AdminController {
 
     private final User admin;
+    private final Runnable onLogout;
     private final MedicineService medicineService = new MedicineService();
     private final SupplierService supplierService = new SupplierService();
     private final UserService userService = new UserService();
     private final ReportService reportService = new ReportService();
 
-    public AdminController(User admin) {
+    /**
+     * @param admin    the authenticated Admin this session belongs to
+     * @param onLogout callback wired to the dashboard's "Log Out" menu action (see
+     *                 {@link com.zugobite.pims.views.AccountMenuBar}); supplied by
+     *                 {@link LoginController} so it can return to the login screen without
+     *                 this controller needing to know anything about how login itself works
+     */
+    public AdminController(User admin, Runnable onLogout) {
         this.admin = admin;
+        this.onLogout = onLogout;
     }
 
     /** Opens the Admin dashboard window. Called once by {@link LoginController} right after login. */
     public void start() {
-        new AdminDashboardView(admin, medicineService, supplierService, userService, reportService).setVisible(true);
+        new AdminDashboardView(admin, medicineService, supplierService, userService, reportService, onLogout).setVisible(true);
     }
 }

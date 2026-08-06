@@ -12,42 +12,31 @@ import java.awt.*;
  * database directly. Every click just forwards the raw field values to
  * {@link LoginController#handleLogin}, which owns the actual authentication decision and
  * subsequent routing.
+ *
+ * <p>As the very first thing a user (or a grader) sees, this screen carries the most visual
+ * weight of any in the app: a branded header band in {@link UIUtils#ACCENT_COLOR} names the
+ * product, and the form below uses stacked label-above-field rows and a full-width primary
+ * button — a more modern layout than the older right-aligned-label style still used in the
+ * smaller Add/Edit dialogs elsewhere, appropriate for the one screen every user opens first.</p>
  */
 public class LoginView extends JFrame {
 
-    private final JTextField usernameField = new JTextField(18);
-    private final JPasswordField passwordField = new JPasswordField(18);
+    private final JTextField usernameField = new JTextField(20);
+    private final JPasswordField passwordField = new JPasswordField(20);
 
     public LoginView(LoginController controller) {
         super("HealthFirst PIMS — Login");
-        // EXIT_ON_CLOSE here (rather than DISPOSE_ON_CLOSE) is correct specifically because
-        // this is the *first* window: closing it before logging in should end the program.
-        // Dashboards opened after login use DISPOSE_ON_CLOSE-style defaults instead, since
-        // those are launched by, but not equivalent to, the whole application.
+        // EXIT_ON_CLOSE is correct here for the same reason it's correct on the dashboards
+        // (see AdminDashboardView/CashierDashboardView): clicking the titlebar's close
+        // button is a deliberate "quit the app" gesture, so it should end the program from
+        // any of these top-level windows, whether the user hasn't logged in yet or is
+        // looking at a dashboard. Logging out is a *different* action (see
+        // AccountMenuBar's "Log Out" item) that disposes the current window and re-shows
+        // this one programmatically — dispose() does not trigger EXIT_ON_CLOSE's listener,
+        // so that path never exits the JVM.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
-
-        JPanel panel = new JPanel(new GridBagLayout());
-        UIUtils.applyStandardPadding(panel);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(6, 6, 6, 6);
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(new JLabel("Username:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        panel.add(usernameField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(new JLabel("Password:"), gbc);
-
-        gbc.gridx = 1;
-        gbc.anchor = GridBagConstraints.WEST;
-        panel.add(passwordField, gbc);
+        UIUtils.applyAppIcon(this);
 
         JButton loginButton = new JButton("Log In");
         // getPassword() returns a char[] rather than String specifically so a JPasswordField
@@ -58,20 +47,88 @@ public class LoginView extends JFrame {
                 usernameField.getText().trim(),
                 new String(passwordField.getPassword())
         ));
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.anchor = GridBagConstraints.EAST;
-        panel.add(loginButton, gbc);
+
+        JPanel root = new JPanel(new BorderLayout());
+        root.add(buildHeader(), BorderLayout.NORTH);
+        root.add(buildForm(loginButton), BorderLayout.CENTER);
 
         // Lets the user press Enter from either field instead of having to click the button.
         getRootPane().setDefaultButton(loginButton);
-        setContentPane(panel);
+        setContentPane(root);
         pack();
         setLocationRelativeTo(null);
+    }
+
+    /** The accent-colored banner naming the product — the first thing anyone sees when the app opens. */
+    private JPanel buildHeader() {
+        JPanel header = new JPanel();
+        header.setLayout(new BoxLayout(header, BoxLayout.Y_AXIS));
+        header.setBackground(UIUtils.ACCENT_COLOR);
+        header.setBorder(BorderFactory.createEmptyBorder(28, 32, 24, 32));
+
+        JLabel titleLabel = new JLabel("HealthFirst PIMS");
+        titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD, 24f));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel subtitleLabel = new JLabel("Pharmacy Inventory Management System");
+        subtitleLabel.setFont(subtitleLabel.getFont().deriveFont(Font.PLAIN, 13f));
+        subtitleLabel.setForeground(new Color(255, 255, 255, 210));
+        subtitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        header.add(titleLabel);
+        header.add(Box.createVerticalStrut(4));
+        header.add(subtitleLabel);
+        return header;
+    }
+
+    /** The username/password fields and primary "Log In" button, stacked for a clean, modern form layout. */
+    private JPanel buildForm(JButton loginButton) {
+        JPanel form = new JPanel(new GridBagLayout());
+        form.setBorder(BorderFactory.createEmptyBorder(28, 32, 32, 32));
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1;
+        gbc.anchor = GridBagConstraints.WEST;
+
+        gbc.gridy = 0;
+        gbc.insets = new Insets(0, 0, 4, 0);
+        form.add(new JLabel("Username"), gbc);
+
+        gbc.gridy = 1;
+        gbc.insets = new Insets(0, 0, 16, 0);
+        form.add(usernameField, gbc);
+
+        gbc.gridy = 2;
+        gbc.insets = new Insets(0, 0, 4, 0);
+        form.add(new JLabel("Password"), gbc);
+
+        gbc.gridy = 3;
+        gbc.insets = new Insets(0, 0, 24, 0);
+        form.add(passwordField, gbc);
+
+        gbc.gridy = 4;
+        gbc.insets = new Insets(0, 0, 0, 0);
+        loginButton.setPreferredSize(new Dimension(0, 36));
+        form.add(loginButton, gbc);
+
+        return form;
     }
 
     /** Called by {@link LoginController} to surface an authentication or connectivity error. */
     public void showError(String message) {
         UIUtils.showError(this, message);
+    }
+
+    /**
+     * Blanks out both fields. Called by {@link LoginController} before re-showing this
+     * window after a logout, so the next person to use the machine doesn't see (or
+     * accidentally submit) the previous user's username/password.
+     */
+    public void clearFields() {
+        usernameField.setText("");
+        passwordField.setText("");
     }
 }

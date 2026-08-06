@@ -55,11 +55,29 @@ public class LoginController {
         }
     }
 
-    /** Dispatches to {@link AdminController} or {@link CashierController} based on the authenticated user's role. */
+    /**
+     * Dispatches to {@link AdminController} or {@link CashierController} based on the
+     * authenticated user's role, handing each one {@link #logout()} as the callback their
+     * dashboard's "Log Out" menu action should invoke (see {@link com.zugobite.pims.views.AccountMenuBar}).
+     */
     private void route(User user) {
         switch (user.getRole()) {
-            case ADMIN -> new AdminController(user).start();
-            case CASHIER -> new CashierController(user).start();
+            case ADMIN -> new AdminController(user, this::logout).start();
+            case CASHIER -> new CashierController(user, this::logout).start();
         }
+    }
+
+    /**
+     * Returns to the login screen after a "Log Out" click. By this point the dashboard that
+     * triggered it has already disposed itself (see {@link com.zugobite.pims.views.AccountMenuBar}),
+     * so all that's left is to blank out any stale credentials from the *previous* session
+     * and re-show the same {@link #loginView} instance — Swing supports calling
+     * {@code setVisible(true)} again on a disposed {@link javax.swing.JFrame}; it simply
+     * recreates the native window, so there's no need to build a brand-new {@code LoginView}
+     * (or a brand-new {@code LoginController}) just to log back in.
+     */
+    private void logout() {
+        loginView.clearFields();
+        loginView.setVisible(true);
     }
 }

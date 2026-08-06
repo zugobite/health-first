@@ -5,6 +5,7 @@ import com.zugobite.pims.services.MedicineService;
 import com.zugobite.pims.services.ReportService;
 import com.zugobite.pims.services.SupplierService;
 import com.zugobite.pims.services.UserService;
+import com.zugobite.pims.utils.UIUtils;
 
 import javax.swing.*;
 
@@ -16,12 +17,24 @@ import javax.swing.*;
  */
 public class AdminDashboardView extends JFrame {
 
+    /**
+     * @param onLogout callback that returns to the login screen; wired into this window's
+     *                 {@link AccountMenuBar} "Log Out" action
+     */
     public AdminDashboardView(User admin, MedicineService medicineService, SupplierService supplierService,
-                               UserService userService, ReportService reportService) {
+                               UserService userService, ReportService reportService, Runnable onLogout) {
         super("HealthFirst PIMS — Admin Dashboard (" + admin.getFullName() + ")");
+        // Closing this window via the titlebar button quits the app, same as LoginView —
+        // see that class's comment for why. Logging out is the separate, non-quitting path
+        // provided by the "Log Out" item in the menu bar below.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 600);
         setLocationRelativeTo(null);
+        UIUtils.applyAppIcon(this);
+
+        // Gives the Admin a way to see who they're logged in as and to log out — without
+        // this, the only way to switch users was to quit and relaunch the whole app.
+        setJMenuBar(new AccountMenuBar(admin, this, onLogout));
 
         JTabbedPane tabs = new JTabbedPane();
         // ManageMedicinesPanel needs SupplierService too, purely to populate the supplier

@@ -20,15 +20,24 @@ import com.zugobite.pims.views.CashierDashboardView;
 public class CashierController {
 
     private final User cashier;
+    private final Runnable onLogout;
     private final MedicineService medicineService = new MedicineService();
     private final SalesService salesService = new SalesService();
 
-    public CashierController(User cashier) {
+    /**
+     * @param cashier  the authenticated Cashier this session belongs to
+     * @param onLogout callback wired to the dashboard's "Log Out" menu action (see
+     *                 {@link com.zugobite.pims.views.AccountMenuBar}); supplied by
+     *                 {@link LoginController} so it can return to the login screen without
+     *                 this controller needing to know anything about how login itself works
+     */
+    public CashierController(User cashier, Runnable onLogout) {
         this.cashier = cashier;
+        this.onLogout = onLogout;
     }
 
     /** Opens the Cashier dashboard window. Called once by {@link LoginController} right after login. */
     public void start() {
-        new CashierDashboardView(cashier, medicineService, salesService).setVisible(true);
+        new CashierDashboardView(cashier, medicineService, salesService, onLogout).setVisible(true);
     }
 }

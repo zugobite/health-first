@@ -36,8 +36,21 @@ public class ManageMedicinesPanel extends JPanel {
         public boolean isCellEditable(int row, int column) {
             return false;
         }
+
+        // Declaring the numeric columns' real type (rather than the Object.class default)
+        // is what makes Swing's built-in table renderer right-align them automatically —
+        // JTable falls back through a value's superclasses to find a registered renderer,
+        // and both Integer and BigDecimal resolve to the same right-aligned Number renderer.
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return switch (columnIndex) {
+                case 0, 5, 6, 8 -> Integer.class;
+                case 4 -> BigDecimal.class;
+                default -> Object.class;
+            };
+        }
     };
-    private final JTable table = new JTable(tableModel);
+    private final JTable table = new StripedTable(tableModel);
 
     public ManageMedicinesPanel(MedicineService medicineService, SupplierService supplierService) {
         this.medicineService = medicineService;

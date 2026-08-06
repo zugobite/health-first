@@ -27,8 +27,19 @@ public class StockCheckPanel extends JPanel {
         public boolean isCellEditable(int row, int column) {
             return false;
         }
+
+        // Price/In Stock are numeric — declaring their real column type right-aligns them
+        // via Swing's built-in Number renderer (see ManageMedicinesPanel for the explanation).
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return switch (columnIndex) {
+                case 2 -> java.math.BigDecimal.class;
+                case 3 -> Integer.class;
+                default -> Object.class;
+            };
+        }
     };
-    private final JTable table = new JTable(tableModel);
+    private final JTable table = new StripedTable(tableModel);
 
     public StockCheckPanel(MedicineService medicineService) {
         this.medicineService = medicineService;

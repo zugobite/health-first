@@ -9,6 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 
 /**
  * Handles the one operation with real correctness stakes in this app: turning a Cashier's
@@ -30,10 +31,11 @@ public class SalesService {
      * {@code conn.setAutoCommit(false)} / {@code commit()} / {@code rollback()} means either
      * the *entire* checkout succeeds, or none of it is saved at all.</p>
      *
-     * <p>On success, mutates the passed-in {@code sale} by calling
-     * {@link Sale#setSaleId(int)} with the database-generated ID, so the caller (see
-     * {@link com.zugobite.pims.views.PosPanel#checkout()}) can immediately use it to print a
-     * bill referencing the real sale number.</p>
+     * <p>On success, mutates the passed-in {@code sale} by calling {@link Sale#setSaleId(int)}
+     * and {@link Sale#setSaleDate}, populated from what the database actually assigned (the
+     * AUTO_INCREMENT id and the {@code DEFAULT CURRENT_TIMESTAMP} sale_date respectively), so
+     * the caller (see {@link com.zugobite.pims.views.PosPanel#checkout()}) can immediately
+     * print or PDF-export a bill referencing the real, persisted sale number and timestamp.</p>
      *
      * @throws SQLException propagated after a rollback, if any step of the transaction fails
      *                       (e.g. a medicine_id that no longer exists)
@@ -58,6 +60,20 @@ public class SalesService {
                     try (ResultSet keys = stmt.getGeneratedKeys()) {
                         keys.next();
                         saleId = keys.getInt(1);
+                    }
+                }
+
+                // sale_date has no value to bind above — it's populated server-side by the
+                // column's DEFAULT CURRENT_TIMESTAMP — so it has to be read back with its own
+                // query rather than via getGeneratedKeys(), which only ever returns the
+                // AUTO_INCREMENT column. Still inside the same transaction/connection, so
+                // this reads back exactly the row that was just inserted.
+                try (PreparedStatement stmt = conn.prepareStatement("SELECT sale_date FROM sales WHERE sale_id = ?")) {
+                    stmt.setInt(1, saleId);
+                    try (ResultSet rs = stmt.executeQuery()) {
+                        rs.next();
+                        Timestamp saleDate = rs.getTimestamp("sale_date");
+                        sale.setSaleDate(saleDate.toLocalDateTime());
                     }
                 }
 

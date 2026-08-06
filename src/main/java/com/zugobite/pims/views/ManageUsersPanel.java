@@ -32,8 +32,15 @@ public class ManageUsersPanel extends JPanel {
         public boolean isCellEditable(int row, int column) {
             return false;
         }
+
+        // ID is the only numeric column here — declaring its real type right-aligns it via
+        // Swing's built-in Number renderer (see ManageMedicinesPanel for the full explanation).
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return columnIndex == 0 ? Integer.class : Object.class;
+        }
     };
-    private final JTable table = new JTable(tableModel);
+    private final JTable table = new StripedTable(tableModel);
 
     public ManageUsersPanel(UserService userService) {
         this.userService = userService;

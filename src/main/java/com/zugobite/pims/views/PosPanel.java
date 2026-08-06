@@ -32,11 +32,31 @@ public class PosPanel extends JPanel {
     private final SalesService salesService;
 
     private final JTextField searchField = new JTextField(20);
-    private final DefaultTableModel searchResultsModel = new DefaultTableModel(new Object[]{"ID", "Name", "Price", "In Stock"}, 0);
-    private final JTable searchResultsTable = new JTable(searchResultsModel);
+    // ID/Price/In Stock are numeric — declaring their real column type right-aligns them via
+    // Swing's built-in Number renderer (see ManageMedicinesPanel for the full explanation).
+    private final DefaultTableModel searchResultsModel = new DefaultTableModel(new Object[]{"ID", "Name", "Price", "In Stock"}, 0) {
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return switch (columnIndex) {
+                case 0, 3 -> Integer.class;
+                case 2 -> java.math.BigDecimal.class;
+                default -> Object.class;
+            };
+        }
+    };
+    private final JTable searchResultsTable = new StripedTable(searchResultsModel);
 
-    private final DefaultTableModel cartModel = new DefaultTableModel(new Object[]{"ID", "Name", "Qty", "Price", "Line Total"}, 0);
-    private final JTable cartTable = new JTable(cartModel);
+    private final DefaultTableModel cartModel = new DefaultTableModel(new Object[]{"ID", "Name", "Qty", "Price", "Line Total"}, 0) {
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return switch (columnIndex) {
+                case 0, 2 -> Integer.class;
+                case 3, 4 -> java.math.BigDecimal.class;
+                default -> Object.class;
+            };
+        }
+    };
+    private final JTable cartTable = new StripedTable(cartModel);
     private final JLabel totalLabel = new JLabel("Total: R0.00");
 
     // The in-progress cart. Reassigned (not mutated in place) by clearCart() — see that
@@ -69,6 +89,14 @@ public class PosPanel extends JPanel {
         // Bottom half: the cart itself, its running total, and the Clear/Checkout actions.
         JPanel cartPanel = new JPanel(new BorderLayout(4, 4));
         cartPanel.add(new JScrollPane(cartTable), BorderLayout.CENTER);
+
+        // The running total is the single most important number on this screen, so it gets
+        // a visibly larger, bolder, accent-colored treatment rather than blending in as
+        // just another label — the same "make the total impossible to miss" convention
+        // real point-of-sale software follows.
+        totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD, 18f));
+        totalLabel.setForeground(UIUtils.ACCENT_COLOR);
+        totalLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
 
         JPanel cartFooter = new JPanel(new BorderLayout());
         cartFooter.add(totalLabel, BorderLayout.WEST);
@@ -156,9 +184,10 @@ public class PosPanel extends JPanel {
         }
         try {
             salesService.checkout(currentSale);
-            // By this point currentSale.getSaleId() has been populated by checkout(), so the
-            // bill can reference the real, persisted sale number.
-            new BillView(currentSale).setVisible(true);
+            // By this point currentSale.getSaleId() and .getSaleDate() have been populated
+            // by checkout(), so the bill can reference the real, persisted sale number and
+            // timestamp — and, via `cashier`, name whoever processed it on the PDF receipt.
+            new BillView(currentSale, cashier).setVisible(true);
             clearCart();
         } catch (SQLException e) {
             UIUtils.showError(this, "Checkout failed: " + e.getMessage());

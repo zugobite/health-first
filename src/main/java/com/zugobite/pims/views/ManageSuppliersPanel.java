@@ -34,8 +34,15 @@ public class ManageSuppliersPanel extends JPanel {
             // until the user explicitly submits an edit.
             return false;
         }
+
+        // ID is the only numeric column here — declaring its real type right-aligns it via
+        // Swing's built-in Number renderer (see ManageMedicinesPanel for the full explanation).
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            return columnIndex == 0 ? Integer.class : Object.class;
+        }
     };
-    private final JTable table = new JTable(tableModel);
+    private final JTable table = new StripedTable(tableModel);
 
     public ManageSuppliersPanel(SupplierService supplierService) {
         this.supplierService = supplierService;
