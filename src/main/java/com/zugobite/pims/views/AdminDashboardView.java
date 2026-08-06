@@ -8,42 +8,57 @@ import com.zugobite.pims.services.UserService;
 import com.zugobite.pims.utils.UIUtils;
 
 import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.util.List;
 
 /**
- * The Admin's main window: a tabbed shell around the four screens PLAN.md §5.3 requires —
- * Manage Medicines, Manage Suppliers, Manage Users, and Reports. This class itself contains
- * no business logic; it only assembles the tabs and hands each one the specific service(s)
- * it needs, all supplied by {@link com.zugobite.pims.controllers.AdminController}.
+ * The Admin's main window: a left sidebar (see {@link SidebarNav}) for switching between the
+ * four screens PLAN.md §5.3 requires — Manage Medicines, Manage Suppliers, Manage Users, and
+ * Reports — with the currently-selected one shown in a {@link CardLayout} content area on
+ * the right. This class itself contains no business logic; it only assembles the screens and
+ * hands each one the specific service(s) it needs, all supplied by
+ * {@link com.zugobite.pims.controllers.AdminController}.
+ *
+ * <p>Uses a sidebar instead of the {@link JTabbedPane} this app used previously — a vertical
+ * nav rail with the account/logout controls anchored at the bottom is the standard shape of
+ * modern admin dashboards, and reads as considerably more "product-like" than a row of tabs
+ * across the top.</p>
  */
 public class AdminDashboardView extends JFrame {
 
-    /**
-     * @param onLogout callback that returns to the login screen; wired into this window's
-     *                 {@link AccountMenuBar} "Log Out" action
-     */
+    // Card names are just the nav index as a string — CardLayout requires a String key, and
+    // there's no more meaningful name needed than "which position in the sidebar is this".
+    private static final List<String> NAV_LABELS = List.of("Manage Medicines", "Manage Suppliers", "Manage Users", "Reports");
+
     public AdminDashboardView(User admin, MedicineService medicineService, SupplierService supplierService,
                                UserService userService, ReportService reportService, Runnable onLogout) {
         super("HealthFirst PIMS — Admin Dashboard (" + admin.getFullName() + ")");
         // Closing this window via the titlebar button quits the app, same as LoginView —
         // see that class's comment for why. Logging out is the separate, non-quitting path
-        // provided by the "Log Out" item in the menu bar below.
+        // provided by the sidebar's "Log Out" button (see SidebarNav).
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(900, 600);
+        setSize(1000, 640);
         setLocationRelativeTo(null);
         UIUtils.applyAppIcon(this);
 
-        // Gives the Admin a way to see who they're logged in as and to log out — without
-        // this, the only way to switch users was to quit and relaunch the whole app.
-        setJMenuBar(new AccountMenuBar(admin, this, onLogout));
+        CardLayout cardLayout = new CardLayout();
+        JPanel content = new JPanel(cardLayout);
+        content.setBackground(UIUtils.BACKGROUND);
 
-        JTabbedPane tabs = new JTabbedPane();
         // ManageMedicinesPanel needs SupplierService too, purely to populate the supplier
         // dropdown in its Add/Edit dialog — it never writes to the suppliers table itself.
-        tabs.addTab("Manage Medicines", new ManageMedicinesPanel(medicineService, supplierService));
-        tabs.addTab("Manage Suppliers", new ManageSuppliersPanel(supplierService));
-        tabs.addTab("Manage Users", new ManageUsersPanel(userService));
-        tabs.addTab("Reports", new ReportsPanel(reportService));
+        content.add(new ManageMedicinesPanel(medicineService, supplierService), "0");
+        content.add(new ManageSuppliersPanel(supplierService), "1");
+        content.add(new ManageUsersPanel(userService), "2");
+        content.add(new ReportsPanel(reportService), "3");
 
-        setContentPane(tabs);
+        SidebarNav sidebar = new SidebarNav("Admin", NAV_LABELS,
+                index -> cardLayout.show(content, String.valueOf(index)), admin, onLogout);
+
+        JPanel root = new JPanel(new BorderLayout());
+        root.add(sidebar, BorderLayout.WEST);
+        root.add(content, BorderLayout.CENTER);
+        setContentPane(root);
     }
 }

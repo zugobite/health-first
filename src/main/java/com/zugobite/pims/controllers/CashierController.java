@@ -26,8 +26,8 @@ public class CashierController {
 
     /**
      * @param cashier  the authenticated Cashier this session belongs to
-     * @param onLogout callback wired to the dashboard's "Log Out" menu action (see
-     *                 {@link com.zugobite.pims.views.AccountMenuBar}); supplied by
+     * @param onLogout callback wired to the dashboard sidebar's "Log Out" button (see
+     *                 {@link com.zugobite.pims.views.SidebarNav}); supplied by
      *                 {@link LoginController} so it can return to the login screen without
      *                 this controller needing to know anything about how login itself works
      */

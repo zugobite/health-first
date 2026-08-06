@@ -69,50 +69,65 @@ public class PosPanel extends JPanel {
         this.salesService = salesService;
         this.currentSale = new Sale(cashier.getUserId());
 
-        setLayout(new BorderLayout(8, 8));
-        UIUtils.applyStandardPadding(this);
+        setLayout(new BorderLayout());
+        setBackground(UIUtils.MUTED_BACKGROUND);
+        setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
 
-        // Top half: search box + results table for finding medicines to add to the cart.
-        JPanel searchPanel = new JPanel(new BorderLayout(4, 4));
-        JPanel searchTop = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        // Top card: search box + results table for finding medicines to add to the cart.
         JButton searchButton = new JButton("Search");
         JButton addToCartButton = new JButton("Add to Cart");
+        UIUtils.styleAsOutlineButton(searchButton);
+        UIUtils.styleAsPrimaryButton(addToCartButton);
         searchButton.addActionListener(e -> search());
         addToCartButton.addActionListener(e -> addSelectedToCart());
-        searchTop.add(new JLabel("Medicine name:"));
-        searchTop.add(searchField);
-        searchTop.add(searchButton);
-        searchTop.add(addToCartButton);
-        searchPanel.add(searchTop, BorderLayout.NORTH);
-        searchPanel.add(new JScrollPane(searchResultsTable), BorderLayout.CENTER);
 
-        // Bottom half: the cart itself, its running total, and the Clear/Checkout actions.
-        JPanel cartPanel = new JPanel(new BorderLayout(4, 4));
-        cartPanel.add(new JScrollPane(cartTable), BorderLayout.CENTER);
+        JPanel searchToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        searchToolbar.setOpaque(false);
+        searchToolbar.add(new JLabel("Medicine name:"));
+        searchToolbar.add(searchField);
+        searchToolbar.add(searchButton);
+        searchToolbar.add(addToCartButton);
 
+        CardPanel searchCard = new CardPanel(new BorderLayout(0, 12));
+        searchCard.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        searchCard.add(searchToolbar, BorderLayout.NORTH);
+        searchCard.add(new JScrollPane(searchResultsTable), BorderLayout.CENTER);
+
+        // Bottom card: the cart itself, its running total, and the Clear/Checkout actions.
         // The running total is the single most important number on this screen, so it gets
         // a visibly larger, bolder, accent-colored treatment rather than blending in as
         // just another label — the same "make the total impossible to miss" convention
         // real point-of-sale software follows.
         totalLabel.setFont(totalLabel.getFont().deriveFont(Font.BOLD, 18f));
         totalLabel.setForeground(UIUtils.ACCENT_COLOR);
-        totalLabel.setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 0));
 
-        JPanel cartFooter = new JPanel(new BorderLayout());
-        cartFooter.add(totalLabel, BorderLayout.WEST);
-        JPanel cartButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         JButton clearButton = new JButton("Clear Cart");
         JButton checkoutButton = new JButton("Checkout");
+        UIUtils.styleAsOutlineButton(clearButton);
+        UIUtils.styleAsPrimaryButton(checkoutButton);
         clearButton.addActionListener(e -> clearCart());
         checkoutButton.addActionListener(e -> checkout());
+
+        JPanel cartButtons = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        cartButtons.setOpaque(false);
         cartButtons.add(clearButton);
         cartButtons.add(checkoutButton);
+
+        JPanel cartFooter = new JPanel(new BorderLayout());
+        cartFooter.setOpaque(false);
+        cartFooter.add(totalLabel, BorderLayout.WEST);
         cartFooter.add(cartButtons, BorderLayout.EAST);
-        cartPanel.add(cartFooter, BorderLayout.SOUTH);
+
+        CardPanel cartCard = new CardPanel(new BorderLayout(0, 12));
+        cartCard.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        cartCard.add(new JScrollPane(cartTable), BorderLayout.CENTER);
+        cartCard.add(cartFooter, BorderLayout.SOUTH);
 
         // Split pane lets the Cashier resize search-results vs. cart space to taste.
-        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, searchPanel, cartPanel);
+        JSplitPane split = new JSplitPane(JSplitPane.VERTICAL_SPLIT, searchCard, cartCard);
         split.setResizeWeight(0.5);
+        split.setOpaque(false);
+        split.setBorder(null);
         add(split, BorderLayout.CENTER);
     }
 

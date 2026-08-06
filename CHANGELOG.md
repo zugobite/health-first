@@ -11,6 +11,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Full UI redesign toward an "enterprise SaaS dashboard" visual language (a Swing/FlatLaf
+  approximation of shadcn/ui's neutral, card-based design system — ShadCN itself is a
+  React/Tailwind library with no Java equivalent, so this reproduces its *look*, not the
+  library):
+  - `CardPanel`: a bordered, rounded-corner white container used to wrap every screen's main
+    content, replacing bare panels sitting directly on the window background
+  - `SidebarNav`: a left-hand navigation rail (brand header, nav items, user/logout footer)
+    that replaces the top `JTabbedPane` and the old `AccountMenuBar` on both dashboards —
+    `AdminDashboardView` and `CashierDashboardView` now use a `CardLayout` content area
+    driven by the sidebar instead of tabs
+  - A neutral "zinc" design-token palette plus a button variant system in `UIUtils`
+    (`styleAsPrimaryButton`/`styleAsOutlineButton`/`styleAsDestructiveButton`/`styleAsGhostButton`,
+    built on FlatLaf's per-component `FlatClientProperties.STYLE` API) applied consistently
+    across every screen and dialog — one dark primary action per screen, neutral outline
+    buttons for secondary actions, red-outline for destructive ones
+  - Global FlatLaf tuning (`UIUtils.installLookAndFeel()`): rounded corners app-wide, a
+    thinner focus ring, pill-shaped minimal scrollbars, and table colors matching the new
+    palette
+  - Redesigned login screen: a centered `CardPanel` "auth card" on a muted page background,
+    replacing the previous edge-to-edge header-band layout
+  - A new procedurally-drawn app icon in the style of macOS's "Liquid Glass" icon redesign —
+    a squircle (superellipse, not a rounded rectangle) with a lit gradient surface, a glossy
+    highlight, a darkened lower edge, and a layered drop-shadowed glyph — replacing the
+    previous flat single-color rounded-square icon
 - Project scaffold: package structure (`enums`, `models`, `data`, `services`, `controllers`, `views`, `utils`)
 - `database.sql` schema (`users`, `suppliers`, `medicines`, `sales`, `sale_items`)
 - `docs/001-APPLICATION_REQUIREMENTS.md` and `docs/002-PROJECT_OVERVIEW.md`

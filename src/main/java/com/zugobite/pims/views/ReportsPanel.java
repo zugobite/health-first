@@ -56,24 +56,34 @@ public class ReportsPanel extends JPanel {
 
     public ReportsPanel(ReportService reportService) {
         this.reportService = reportService;
-        setLayout(new BorderLayout(8, 8));
-        UIUtils.applyStandardPadding(this);
+        setLayout(new BorderLayout());
+        setBackground(UIUtils.MUTED_BACKGROUND);
+        setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
 
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton runButton = new JButton("Run Report");
         JButton exportPdfButton = new JButton("Export to PDF");
         JButton exportExcelButton = new JButton("Export to Excel");
+        UIUtils.styleAsPrimaryButton(runButton);
+        UIUtils.styleAsOutlineButton(exportPdfButton);
+        UIUtils.styleAsOutlineButton(exportExcelButton);
         runButton.addActionListener(e -> runSelectedReport());
         exportPdfButton.addActionListener(e -> exportReport(ExportFormat.PDF));
         exportExcelButton.addActionListener(e -> exportReport(ExportFormat.EXCEL));
-        top.add(new JLabel("Report:"));
-        top.add(reportSelector);
-        top.add(runButton);
-        top.add(exportPdfButton);
-        top.add(exportExcelButton);
-        add(top, BorderLayout.NORTH);
 
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        toolbar.setOpaque(false);
+        toolbar.add(new JLabel("Report:"));
+        toolbar.add(reportSelector);
+        toolbar.add(runButton);
+        toolbar.add(exportPdfButton);
+        toolbar.add(exportExcelButton);
+
+        CardPanel card = new CardPanel(new BorderLayout(0, 12));
+        card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        card.add(toolbar, BorderLayout.NORTH);
+        card.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        add(card, BorderLayout.CENTER);
     }
 
     /**

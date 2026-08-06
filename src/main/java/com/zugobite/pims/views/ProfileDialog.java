@@ -7,8 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Read-only "who am I logged in as" dialog, reachable from the Account menu on both
- * {@link AdminDashboardView} and {@link CashierDashboardView} via {@link AccountMenuBar}.
+ * Read-only "who am I logged in as" dialog, reachable from the "View Profile" button in the
+ * sidebar footer on both {@link AdminDashboardView} and {@link CashierDashboardView} (see
+ * {@link SidebarNav}).
  *
  * <p>Deliberately view-only: there's no edit/save flow here. {@link User} itself has no
  * setters (see its class comment), and profile self-editing (changing your own password,
@@ -33,6 +34,7 @@ public class ProfileDialog extends JDialog {
 
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dispose());
+        UIUtils.styleAsPrimaryButton(closeButton);
         JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonRow.add(closeButton);
 

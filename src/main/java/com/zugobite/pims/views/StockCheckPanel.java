@@ -43,18 +43,26 @@ public class StockCheckPanel extends JPanel {
 
     public StockCheckPanel(MedicineService medicineService) {
         this.medicineService = medicineService;
-        setLayout(new BorderLayout(8, 8));
-        UIUtils.applyStandardPadding(this);
+        setLayout(new BorderLayout());
+        setBackground(UIUtils.MUTED_BACKGROUND);
+        setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
 
-        JPanel top = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton searchButton = new JButton("Search");
+        UIUtils.styleAsPrimaryButton(searchButton);
         searchButton.addActionListener(e -> search());
-        top.add(new JLabel("Medicine name:"));
-        top.add(searchField);
-        top.add(searchButton);
-        add(top, BorderLayout.NORTH);
 
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        toolbar.setOpaque(false);
+        toolbar.add(new JLabel("Medicine name:"));
+        toolbar.add(searchField);
+        toolbar.add(searchButton);
+
+        CardPanel card = new CardPanel(new BorderLayout(0, 12));
+        card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        card.add(toolbar, BorderLayout.NORTH);
+        card.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        add(card, BorderLayout.CENTER);
     }
 
     /** Runs a partial-match search and repopulates the results table — read-only, no cart involved. */

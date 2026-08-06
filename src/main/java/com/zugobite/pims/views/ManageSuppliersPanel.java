@@ -46,27 +46,37 @@ public class ManageSuppliersPanel extends JPanel {
 
     public ManageSuppliersPanel(SupplierService supplierService) {
         this.supplierService = supplierService;
-        setLayout(new BorderLayout(8, 8));
-        UIUtils.applyStandardPadding(this);
+        setLayout(new BorderLayout());
+        setBackground(UIUtils.MUTED_BACKGROUND);
+        setBorder(BorderFactory.createEmptyBorder(24, 24, 24, 24));
 
-        add(new JScrollPane(table), BorderLayout.CENTER);
-
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JButton refreshButton = new JButton("Refresh");
-        JButton addButton = new JButton("Add");
+        JButton addButton = new JButton("Add Supplier");
         JButton editButton = new JButton("Edit");
         JButton deleteButton = new JButton("Delete");
+        UIUtils.styleAsOutlineButton(refreshButton);
+        UIUtils.styleAsPrimaryButton(addButton);
+        UIUtils.styleAsOutlineButton(editButton);
+        UIUtils.styleAsDestructiveButton(deleteButton);
 
         refreshButton.addActionListener(e -> loadSuppliers());
         addButton.addActionListener(e -> openAddDialog());
         editButton.addActionListener(e -> openEditDialog());
         deleteButton.addActionListener(e -> deleteSelected());
 
-        buttons.add(refreshButton);
-        buttons.add(addButton);
-        buttons.add(editButton);
-        buttons.add(deleteButton);
-        add(buttons, BorderLayout.SOUTH);
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        toolbar.setOpaque(false);
+        toolbar.add(refreshButton);
+        toolbar.add(addButton);
+        toolbar.add(editButton);
+        toolbar.add(deleteButton);
+
+        CardPanel card = new CardPanel(new BorderLayout(0, 12));
+        card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        card.add(toolbar, BorderLayout.NORTH);
+        card.add(new JScrollPane(table), BorderLayout.CENTER);
+
+        add(card, BorderLayout.CENTER);
 
         // Populate the table immediately on construction so the tab isn't blank until the
         // user manually clicks "Refresh".

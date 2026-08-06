@@ -56,6 +56,7 @@ public class BillView extends JFrame {
         billText.setText(buildReceipt(sale));
 
         JButton printButton = new JButton("Print");
+        UIUtils.styleAsOutlineButton(printButton);
         printButton.addActionListener(e -> {
             try {
                 // JTextComponent.print() is Swing's built-in, zero-setup print pipeline —
@@ -68,6 +69,7 @@ public class BillView extends JFrame {
         });
 
         JButton savePdfButton = new JButton("Save as PDF");
+        UIUtils.styleAsPrimaryButton(savePdfButton);
         savePdfButton.addActionListener(e -> saveAsPdf());
 
         JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.CENTER));

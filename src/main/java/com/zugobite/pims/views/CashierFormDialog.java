@@ -42,6 +42,8 @@ public class CashierFormDialog extends JDialog {
 
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
+        UIUtils.styleAsPrimaryButton(okButton);
+        UIUtils.styleAsOutlineButton(cancelButton);
         okButton.addActionListener(e -> onConfirm());
         cancelButton.addActionListener(e -> dispose());
 
