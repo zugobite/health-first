@@ -49,7 +49,7 @@ public final class AppIcons {
         if (url != null) {
             return new FlatSVGIcon(url);
         }
-        // Dev classpath often is only `out/` — resolve from the repo resources tree.
+        // Dev classpath often is only `out/` - resolve from the repo resources tree.
         File file = new File("src/main/resources/" + resourcePath);
         if (file.isFile()) {
             return new FlatSVGIcon(file);

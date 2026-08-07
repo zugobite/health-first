@@ -85,14 +85,36 @@ public final class UIUtils {
      */
     public static final Color ACCENT_COLOR = new Color(0x0F, 0x76, 0x6E);
 
-    private static final int RADIUS = 8;
     /**
-     * Corner arc for cards / tiles, passed to {@link java.awt.Graphics#fillRoundRect} /
-     * {@link java.awt.geom.RoundRectangle2D} (Java2D's arc width/height — roughly twice a
-     * CSS {@code border-radius}). Keep this clearly larger than control {@link #RADIUS} so
-     * large panels read as rounded, not square.
+     * Per-module home-tile colors: light tinted surface, hover tint, and saturated icon accent.
+     * Derived from the teal/zinc palette so launcher tiles stay on-brand but distinguishable.
      */
-    public static final int CARD_RADIUS = 24;
+    public record ModuleAccent(Color background, Color hoverBackground, Color accent) {
+    }
+
+    /** Manage Medicines - core pharmacy / brand teal. */
+    public static final ModuleAccent MODULE_MEDICINES = new ModuleAccent(
+            new Color(0xE6, 0xF5, 0xF3), new Color(0xD4, 0xEB, 0xE8), PRIMARY);
+    /** Manage Suppliers - logistics, deeper teal. */
+    public static final ModuleAccent MODULE_SUPPLIERS = new ModuleAccent(
+            new Color(0xE8, 0xF3, 0xF2), new Color(0xD6, 0xE7, 0xE5), ACCENT_COLOR);
+    /** Manage Users - people / admin, darkest teal. */
+    public static final ModuleAccent MODULE_USERS = new ModuleAccent(
+            new Color(0xE2, 0xEE, 0xED), new Color(0xD0, 0xE0, 0xDE), PRIMARY_PRESSED);
+    /** Reports - analytics, neutral zinc. */
+    public static final ModuleAccent MODULE_REPORTS = new ModuleAccent(
+            MUTED_BACKGROUND, HOVER_BACKGROUND, FOREGROUND);
+    /** Point of Sale - sales, bright teal tint. */
+    public static final ModuleAccent MODULE_POS = new ModuleAccent(
+            new Color(0xD9, 0xF0, 0xEC), new Color(0xC5, 0xE6, 0xE1), PRIMARY);
+    /** Stock Check - inventory, mid teal. */
+    public static final ModuleAccent MODULE_STOCK = new ModuleAccent(
+            new Color(0xF0, 0xFA, 0xF9), new Color(0xE0, 0xF2, 0xF0), PRIMARY_HOVER);
+
+    /** Corner radius for controls and cards — 0 for square corners throughout the UI. */
+    private static final int RADIUS = 0;
+    /** Corner arc for cards / tiles (Java2D arc width/height). Kept in sync with {@link #RADIUS}. */
+    public static final int CARD_RADIUS = RADIUS;
     /** Vertical padding (py) shared by every button and text/combo input. */
     private static final int CONTROL_PAD_Y = 8;
     /** Horizontal padding (px) shared by every button and text/combo input. */
@@ -133,15 +155,16 @@ public final class UIUtils {
         UIManager.put("Component.accentColor", PRIMARY);
         FlatLightLaf.setup();
 
-        // Rounded corners everywhere - the single biggest visual signal of a modern,
-        // "designed" UI versus Swing's boxy default. 8px on buttons/fields/menus matches
-        // Tailwind's "rounded-lg" scale that shadcn/ui components use.
+        // Square corners on all FlatLaf controls.
         UIManager.put("Button.arc", RADIUS);
         UIManager.put("Component.arc", RADIUS);
         UIManager.put("TextComponent.arc", RADIUS);
-        UIManager.put("CheckBox.arc", 4);
+        UIManager.put("CheckBox.arc", RADIUS);
         UIManager.put("ProgressBar.arc", RADIUS);
-        UIManager.put("ScrollPane.arc", CARD_RADIUS);
+        UIManager.put("ComboBox.arc", RADIUS);
+        UIManager.put("ScrollPane.arc", RADIUS);
+        UIManager.put("ScrollPane.Table.arc", RADIUS);
+        UIManager.put("Table.selectionArc", RADIUS);
         UIManager.put("PopupMenu.borderInsets", new java.awt.Insets(4, 4, 4, 4));
 
         // Same py/px on every button and text/combo input so controls share one silhouette.
@@ -176,8 +199,8 @@ public final class UIUtils {
         // overlay-scrollbar look most modern web and native apps use now, instead of
         // Swing's default chunky, square scrollbar.
         UIManager.put("ScrollBar.width", 10);
-        UIManager.put("ScrollBar.thumbArc", 999);
-        UIManager.put("ScrollBar.trackArc", 999);
+        UIManager.put("ScrollBar.thumbArc", RADIUS);
+        UIManager.put("ScrollBar.trackArc", RADIUS);
         UIManager.put("ScrollBar.showButtons", false);
 
         // Borders/backgrounds pulled from this class's own palette, so FlatLaf's neutrals
@@ -331,7 +354,7 @@ public final class UIUtils {
     }
 
     /**
-     * Solid red fill with white text — used for high-emphasis destructive actions that should
+     * Solid red fill with white text - used for high-emphasis destructive actions that should
      * match the visual weight of a primary button: toolbar "Delete" and the "Log Out" control.
      */
     public static void styleAsSolidDestructiveButton(JButton button) {
@@ -343,14 +366,11 @@ public final class UIUtils {
     }
 
     /**
-     * Wraps a data table in a borderless scroll pane. The surrounding
-     * {@link com.zugobite.pims.views.CardPanel} provides the single rounded outline —
-     * this helper must not paint a second inner border. FlatLaf's
-     * {@code ScrollPane.Table.arc} is also avoided (it inserts side padding / gutters).
+     * Wraps a data table in a FlatLaf scroll pane with a square border ({@code arc: 0}).
+     * {@link com.zugobite.pims.views.CardPanel} provides the outer card outline.
      */
     public static JComponent createRoundedScrollPane(Component view) {
         javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(view);
-        scroll.setBorder(null);
         scroll.setViewportBorder(null);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(true);
@@ -358,6 +378,13 @@ public final class UIUtils {
         if (view instanceof javax.swing.JComponent jc) {
             jc.setOpaque(true);
             jc.setBackground(BACKGROUND);
+        }
+        if (view instanceof javax.swing.JTable) {
+            scroll.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
+            // arc must stay 0 — any positive value adds left/right viewport padding.
+            scroll.putClientProperty(FlatClientProperties.STYLE, "arc: 0");
+        } else {
+            scroll.setBorder(null);
         }
         return scroll;
     }
