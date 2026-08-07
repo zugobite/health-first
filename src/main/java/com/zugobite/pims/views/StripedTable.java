@@ -1,6 +1,9 @@
 package com.zugobite.pims.views;
 
+import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.Color;
@@ -14,6 +17,10 @@ import java.awt.Component;
  * "looks professional" bar (striped rows are one of the most recognisable marks of a
  * polished data table, the same convention Excel, Finder, and most admin dashboards use)
  * is met consistently everywhere at once instead of being hand-rolled per screen.
+ *
+ * <p>All cell text (including numbers) and column headers are left-aligned - a deliberate
+ * desktop-native choice rather than Swing's default right-alignment for {@link Number}
+ * columns.</p>
  *
  * <p>Striping is implemented by overriding {@link #prepareRenderer}, the standard vanilla-Swing
  * technique for this - it runs after the real cell renderer has already set the cell's
@@ -32,11 +39,17 @@ public class StripedTable extends JTable {
         setIntercellSpacing(new java.awt.Dimension(0, 0));
         setFillsViewportHeight(true);
         getTableHeader().setReorderingAllowed(false);
+
+        DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) getTableHeader().getDefaultRenderer();
+        headerRenderer.setHorizontalAlignment(SwingConstants.LEFT);
     }
 
     @Override
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component component = super.prepareRenderer(renderer, row, column);
+        if (component instanceof JLabel label) {
+            label.setHorizontalAlignment(SwingConstants.LEFT);
+        }
         if (!isRowSelected(row)) {
             component.setBackground(row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR);
         }

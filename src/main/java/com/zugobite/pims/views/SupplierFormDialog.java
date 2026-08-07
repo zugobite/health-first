@@ -75,11 +75,11 @@ public class SupplierFormDialog extends JDialog {
         gbc.insets = new Insets(4, 4, 4, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        addRow(panel, gbc, 0, "Name:", nameField);
-        addRow(panel, gbc, 1, "Contact Person:", contactPersonField);
-        addRow(panel, gbc, 2, "Phone:", phoneField);
-        addRow(panel, gbc, 3, "Email:", emailField);
-        addRow(panel, gbc, 4, "Address:", new JScrollPane(addressArea));
+        addRow(panel, gbc, 0, "Name", nameField);
+        addRow(panel, gbc, 1, "Contact Person", contactPersonField);
+        addRow(panel, gbc, 2, "Phone", phoneField);
+        addRow(panel, gbc, 3, "Email", emailField);
+        addRow(panel, gbc, 4, "Address", new JScrollPane(addressArea));
 
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");

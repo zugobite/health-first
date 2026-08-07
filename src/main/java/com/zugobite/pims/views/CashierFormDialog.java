@@ -36,9 +36,9 @@ public class CashierFormDialog extends JDialog {
         gbc.insets = new Insets(4, 4, 4, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        addRow(panel, gbc, 0, "Username:", usernameField);
-        addRow(panel, gbc, 1, "Password:", passwordField);
-        addRow(panel, gbc, 2, "Full Name:", fullNameField);
+        addRow(panel, gbc, 0, "Username", usernameField);
+        addRow(panel, gbc, 1, "Password", passwordField);
+        addRow(panel, gbc, 2, "Full Name", fullNameField);
 
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");

@@ -30,7 +30,7 @@ public class LoginView extends JFrame {
         // button is a deliberate "quit the app" gesture, so it should end the program from
         // any of these top-level windows, whether the user hasn't logged in yet or is
         // looking at a dashboard. Logging out is a *different* action (see
-        // SidebarNav's "Log Out" button) that disposes the current window and re-shows
+        // the dashboard toolbar's "Log Out" button) that disposes the current window and re-shows
         // this one programmatically - dispose() does not trigger EXIT_ON_CLOSE's listener,
         // so that path never exits the JVM.
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

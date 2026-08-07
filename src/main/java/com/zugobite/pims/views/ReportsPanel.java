@@ -72,7 +72,7 @@ public class ReportsPanel extends JPanel {
 
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         toolbar.setOpaque(false);
-        toolbar.add(new JLabel("Report:"));
+        toolbar.add(new JLabel("Report"));
         toolbar.add(reportSelector);
         toolbar.add(runButton);
         toolbar.add(exportPdfButton);

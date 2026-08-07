@@ -8,8 +8,8 @@ import java.awt.*;
 
 /**
  * Read-only "who am I logged in as" dialog, reachable from the "View Profile" button in the
- * sidebar footer on both {@link AdminDashboardView} and {@link CashierDashboardView} (see
- * {@link SidebarNav}).
+ * top toolbar on both {@link AdminDashboardView} and {@link CashierDashboardView} (see
+ * {@link DashboardToolbar}).
  *
  * <p>Deliberately view-only: there's no edit/save flow here. {@link User} itself has no
  * setters (see its class comment), and profile self-editing (changing your own password,
@@ -27,10 +27,10 @@ public class ProfileDialog extends JDialog {
         gbc.insets = new Insets(4, 4, 4, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        addRow(panel, gbc, 0, "Full Name:", user.getFullName());
-        addRow(panel, gbc, 1, "Username:", user.getUsername());
-        addRow(panel, gbc, 2, "Role:", user.getRole().toString());
-        addRow(panel, gbc, 3, "User ID:", String.valueOf(user.getUserId()));
+        addRow(panel, gbc, 0, "Full Name", user.getFullName());
+        addRow(panel, gbc, 1, "Username", user.getUsername());
+        addRow(panel, gbc, 2, "Role", user.getRole().toString());
+        addRow(panel, gbc, 3, "User ID", String.valueOf(user.getUserId()));
 
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> dispose());

@@ -53,8 +53,8 @@ public class StockCheckPanel extends JPanel {
 
         JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         toolbar.setOpaque(false);
-        toolbar.add(new JLabel("Medicine Name:"));
-        UIUtils.setPlaceholder(searchField, "Medicine Name:");
+        toolbar.add(new JLabel("Medicine Name"));
+        UIUtils.setPlaceholder(searchField, "Medicine Name");
         toolbar.add(searchField);
         toolbar.add(searchButton);
 

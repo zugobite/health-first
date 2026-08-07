@@ -83,8 +83,8 @@ public class PosPanel extends JPanel {
 
         JPanel searchToolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
         searchToolbar.setOpaque(false);
-        searchToolbar.add(new JLabel("Medicine Name:"));
-        UIUtils.setPlaceholder(searchField, "Medicine Name:");
+        searchToolbar.add(new JLabel("Medicine Name"));
+        UIUtils.setPlaceholder(searchField, "Medicine Name");
         searchToolbar.add(searchField);
         searchToolbar.add(searchButton);
         searchToolbar.add(addToCartButton);

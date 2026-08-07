@@ -65,14 +65,16 @@ curl -sL -o lib/commons-io.jar https://repo1.maven.org/maven2/commons-io/commons
 curl -sL -o lib/commons-collections4.jar https://repo1.maven.org/maven2/org/apache/commons/commons-collections4/4.5.0/commons-collections4-4.5.0.jar
 curl -sL -o lib/log4j-api.jar https://repo1.maven.org/maven2/org/apache/logging/log4j/log4j-api/2.24.3/log4j-api-2.24.3.jar
 curl -sL -o lib/flatlaf.jar https://repo1.maven.org/maven2/com/formdev/flatlaf/3.7.2/flatlaf-3.7.2.jar
+curl -sL -o lib/flatlaf-extras.jar https://repo1.maven.org/maven2/com/formdev/flatlaf-extras/3.7.2/flatlaf-extras-3.7.2.jar
+curl -sL -o lib/jsvg.jar https://repo1.maven.org/maven2/com/github/weisj/jsvg/2.1.0/jsvg-2.1.0.jar
 
-CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:lib/poi-ooxml-lite.jar:lib/xmlbeans.jar:lib/commons-compress.jar:lib/commons-io.jar:lib/commons-collections4.jar:lib/log4j-api.jar:lib/flatlaf.jar"
+CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:lib/poi-ooxml-lite.jar:lib/xmlbeans.jar:lib/commons-compress.jar:lib/commons-io.jar:lib/commons-collections4.jar:lib/log4j-api.jar:lib/flatlaf.jar:lib/flatlaf-extras.jar:lib/jsvg.jar"
 
 # Compile all Java source files
 find src -name "*.java" | xargs javac -cp "$CP" -d out
 
 # Run the application
-java -Xdock:name="HealthFirst PIMS" -cp "out:$CP" com.zugobite.pims.Main
+java -Xdock:name="HealthFirst PIMS" -cp "out:src/main/resources:$CP" com.zugobite.pims.Main
 ```
 
 Default credentials (from seed data): `admin/admin123` (Admin), `cashier/cash123` (Cashier).
@@ -153,13 +155,13 @@ See [docs/002-PROJECT_OVERVIEW.md](docs/002-PROJECT_OVERVIEW.md) for the complet
 ## Development
 
 ```bash
-CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:lib/poi-ooxml-lite.jar:lib/xmlbeans.jar:lib/commons-compress.jar:lib/commons-io.jar:lib/commons-collections4.jar:lib/log4j-api.jar:lib/flatlaf.jar"
+CP="lib/mysql-connector-j.jar:lib/pdfbox-app.jar:lib/poi.jar:lib/poi-ooxml.jar:lib/poi-ooxml-lite.jar:lib/xmlbeans.jar:lib/commons-compress.jar:lib/commons-io.jar:lib/commons-collections4.jar:lib/log4j-api.jar:lib/flatlaf.jar:lib/flatlaf-extras.jar:lib/jsvg.jar"
 
 # Compile all source files
 find src -name "*.java" | xargs javac -cp "$CP" -d out
 
 # Run the application
-java -Xdock:name="HealthFirst PIMS" -cp "out:$CP" com.zugobite.pims.Main
+java -Xdock:name="HealthFirst PIMS" -cp "out:src/main/resources:$CP" com.zugobite.pims.Main
 ```
 
 ### Architecture

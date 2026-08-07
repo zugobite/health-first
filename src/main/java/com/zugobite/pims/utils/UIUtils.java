@@ -86,8 +86,13 @@ public final class UIUtils {
     public static final Color ACCENT_COLOR = new Color(0x0F, 0x76, 0x6E);
 
     private static final int RADIUS = 8;
-    /** Corner radius for cards and rounded table scroll panes - slightly softer than controls. */
-    public static final int CARD_RADIUS = 10;
+    /**
+     * Corner arc for cards / tiles, passed to {@link java.awt.Graphics#fillRoundRect} /
+     * {@link java.awt.geom.RoundRectangle2D} (Java2D's arc width/height — roughly twice a
+     * CSS {@code border-radius}). Keep this clearly larger than control {@link #RADIUS} so
+     * large panels read as rounded, not square.
+     */
+    public static final int CARD_RADIUS = 24;
     /** Vertical padding (py) shared by every button and text/combo input. */
     private static final int CONTROL_PAD_Y = 8;
     /** Horizontal padding (px) shared by every button and text/combo input. */
@@ -136,6 +141,7 @@ public final class UIUtils {
         UIManager.put("TextComponent.arc", RADIUS);
         UIManager.put("CheckBox.arc", 4);
         UIManager.put("ProgressBar.arc", RADIUS);
+        UIManager.put("ScrollPane.arc", CARD_RADIUS);
         UIManager.put("PopupMenu.borderInsets", new java.awt.Insets(4, 4, 4, 4));
 
         // Same py/px on every button and text/combo input so controls share one silhouette.
@@ -312,11 +318,9 @@ public final class UIUtils {
     }
 
     /**
-     * The destructive-action style: white background, red text/border, light-red hover -
-     * used for every "Delete" button. Intentionally an <em>outline</em> style rather than a
-     * solid red fill, so a row of toolbar buttons doesn't read as "something's already gone
-     * wrong" at rest - the red only asserts itself on hover, right before the click that
-     * actually matters.
+     * The destructive-action outline style: white background, red text/border, light-red
+     * hover. Kept for secondary destructive controls; toolbar "Delete" and "Log Out" use
+     * {@link #styleAsSolidDestructiveButton} instead.
      */
     public static void styleAsDestructiveButton(JButton button) {
         button.putClientProperty(FlatClientProperties.STYLE, String.format(
@@ -327,10 +331,8 @@ public final class UIUtils {
     }
 
     /**
-     * Solid red fill with white text - used for high-emphasis destructive actions that should
-     * match the visual weight of a primary button (currently the sidebar "Log Out" control).
-     * Toolbar "Delete" buttons stay on {@link #styleAsDestructiveButton} (outline) so they
-     * don't dominate a row of actions at rest.
+     * Solid red fill with white text — used for high-emphasis destructive actions that should
+     * match the visual weight of a primary button: toolbar "Delete" and the "Log Out" control.
      */
     public static void styleAsSolidDestructiveButton(JButton button) {
         button.putClientProperty(FlatClientProperties.STYLE, String.format(
@@ -341,76 +343,29 @@ public final class UIUtils {
     }
 
     /**
-     * Wraps a data table in a borderless scroll pane inside a custom rounded, bordered
-     * panel. FlatLaf's {@code ScrollPane.Table.arc} is intentionally <em>not</em> used —
-     * it rounds the outline by inserting left/right padding (via
-     * {@code FlatScrollPaneBorder.getLeftRightPadding}), which leaves empty white gutters
-     * beside the table. Painting the round rect ourselves keeps the table edge-to-edge
-     * while still showing a rounded border.
+     * Wraps a data table in a borderless scroll pane. The surrounding
+     * {@link com.zugobite.pims.views.CardPanel} provides the single rounded outline —
+     * this helper must not paint a second inner border. FlatLaf's
+     * {@code ScrollPane.Table.arc} is also avoided (it inserts side padding / gutters).
      */
     public static JComponent createRoundedScrollPane(Component view) {
         javax.swing.JScrollPane scroll = new javax.swing.JScrollPane(view);
-        scroll.setBorder(new EmptyBorder(0, 0, 0, 0));
-        scroll.putClientProperty(FlatClientProperties.STYLE, "arc: 0; borderWidth: 0;");
-        scroll.getViewport().setBackground(BACKGROUND);
+        scroll.setBorder(null);
+        scroll.setViewportBorder(null);
         scroll.setOpaque(false);
         scroll.getViewport().setOpaque(true);
-
-        return new RoundedViewportPanel(scroll);
-    }
-
-    /**
-     * Fills edge-to-edge with the scroll pane, clips children to a rounded rect, and draws
-     * the border stroke on top so corners look rounded without FlatLaf's arc insets.
-     */
-    private static final class RoundedViewportPanel extends JComponent {
-        RoundedViewportPanel(Component child) {
-            setLayout(new java.awt.BorderLayout());
-            setOpaque(false);
-            setBackground(BACKGROUND);
-            add(child, java.awt.BorderLayout.CENTER);
+        scroll.getViewport().setBackground(BACKGROUND);
+        if (view instanceof javax.swing.JComponent jc) {
+            jc.setOpaque(true);
+            jc.setBackground(BACKGROUND);
         }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            float w = getWidth() - 1f;
-            float h = getHeight() - 1f;
-            java.awt.geom.RoundRectangle2D.Float shape =
-                    new java.awt.geom.RoundRectangle2D.Float(0, 0, w, h, CARD_RADIUS, CARD_RADIUS);
-            g2.setColor(getBackground());
-            g2.fill(shape);
-            g2.dispose();
-        }
-
-        @Override
-        protected void paintChildren(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.clip(new java.awt.geom.RoundRectangle2D.Float(
-                    1, 1, getWidth() - 3f, getHeight() - 3f, CARD_RADIUS, CARD_RADIUS));
-            super.paintChildren(g2);
-            g2.dispose();
-        }
-
-        @Override
-        public void paint(Graphics g) {
-            paintComponent(g);
-            paintChildren(g);
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(BORDER_COLOR);
-            g2.draw(new java.awt.geom.RoundRectangle2D.Float(
-                    0, 0, getWidth() - 1f, getHeight() - 1f, CARD_RADIUS, CARD_RADIUS));
-            g2.dispose();
-        }
+        return scroll;
     }
 
     /**
      * The lowest-emphasis style: no border, no background until hovered - used for
-     * navigation items (see {@link com.zugobite.pims.views.SidebarNav}) and other controls
-     * that need to feel like part of the page's structure rather than a distinct button.
+     * low-emphasis controls that need to feel like part of the page's structure rather than
+     * a distinct button.
      */
     public static void styleAsGhostButton(JButton button) {
         button.putClientProperty(FlatClientProperties.STYLE, String.format(

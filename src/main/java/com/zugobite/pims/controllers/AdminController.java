@@ -10,7 +10,7 @@ import com.zugobite.pims.views.AdminDashboardView;
 /**
  * Wires up the Admin experience after a successful login: owns one instance of every
  * service Admin's screens need (medicines, suppliers, users, reports) and hands them all to
- * {@link AdminDashboardView}, which distributes them across its four sidebar screens.
+ * {@link AdminDashboardView}, which distributes them across its four module screens.
  *
  * <p>Constructing the services here - rather than inside {@link AdminDashboardView} or its
  * individual tab panels - keeps the views package free of any direct knowledge of how to
@@ -28,8 +28,8 @@ public class AdminController {
 
     /**
      * @param admin    the authenticated Admin this session belongs to
-     * @param onLogout callback wired to the dashboard sidebar's "Log Out" button (see
-     *                 {@link com.zugobite.pims.views.SidebarNav}); supplied by
+     * @param onLogout callback wired to the dashboard toolbar's "Log Out" button (see
+     *                 {@link com.zugobite.pims.views.DashboardToolbar}); supplied by
      *                 {@link LoginController} so it can return to the login screen without
      *                 this controller needing to know anything about how login itself works
      */

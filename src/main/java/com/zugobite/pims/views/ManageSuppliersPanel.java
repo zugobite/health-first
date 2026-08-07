@@ -57,7 +57,7 @@ public class ManageSuppliersPanel extends JPanel {
         UIUtils.styleAsOutlineButton(refreshButton);
         UIUtils.styleAsPrimaryButton(addButton);
         UIUtils.styleAsOutlineButton(editButton);
-        UIUtils.styleAsDestructiveButton(deleteButton);
+        UIUtils.styleAsSolidDestructiveButton(deleteButton);
 
         refreshButton.addActionListener(e -> loadSuppliers());
         addButton.addActionListener(e -> openAddDialog());

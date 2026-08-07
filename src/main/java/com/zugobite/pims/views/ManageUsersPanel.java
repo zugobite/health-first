@@ -53,7 +53,7 @@ public class ManageUsersPanel extends JPanel {
         JButton deleteButton = new JButton("Delete");
         UIUtils.styleAsOutlineButton(refreshButton);
         UIUtils.styleAsPrimaryButton(addButton);
-        UIUtils.styleAsDestructiveButton(deleteButton);
+        UIUtils.styleAsSolidDestructiveButton(deleteButton);
 
         refreshButton.addActionListener(e -> loadCashiers());
         addButton.addActionListener(e -> openAddDialog());

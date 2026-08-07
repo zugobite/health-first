@@ -66,7 +66,7 @@ public class ManageMedicinesPanel extends JPanel {
         UIUtils.styleAsOutlineButton(refreshButton);
         UIUtils.styleAsPrimaryButton(addButton);
         UIUtils.styleAsOutlineButton(editButton);
-        UIUtils.styleAsDestructiveButton(deleteButton);
+        UIUtils.styleAsSolidDestructiveButton(deleteButton);
 
         refreshButton.addActionListener(e -> loadMedicines());
         addButton.addActionListener(e -> openAddDialog());
@@ -80,6 +80,9 @@ public class ManageMedicinesPanel extends JPanel {
         toolbar.add(editButton);
         toolbar.add(deleteButton);
 
+        // The table lives inside a bordered, rounded CardPanel rather than sitting directly
+        // on the page background - the same "content in a card" composition used on every
+        // data screen in the app (see CardPanel's class comment).
         // The table lives inside a bordered, rounded CardPanel rather than sitting directly
         // on the page background - the same "content in a card" composition used on every
         // data screen in the app (see CardPanel's class comment).

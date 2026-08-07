@@ -87,14 +87,14 @@ public class MedicineFormDialog extends JDialog {
         gbc.insets = new Insets(4, 4, 4, 4);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        addRow(panel, gbc, 0, "Name:", nameField);
-        addRow(panel, gbc, 1, "Company:", companyField);
-        addRow(panel, gbc, 2, "Type (Tablet/Capsule/...):", medicineTypeField);
-        addRow(panel, gbc, 3, "Price:", priceField);
-        addRow(panel, gbc, 4, "Quantity in Stock:", quantityField);
-        addRow(panel, gbc, 5, "Reorder Level:", reorderLevelField);
-        addRow(panel, gbc, 6, "Expiry Date (yyyy-mm-dd):", expiryDateField);
-        addRow(panel, gbc, 7, "Supplier:", supplierCombo);
+        addRow(panel, gbc, 0, "Name", nameField);
+        addRow(panel, gbc, 1, "Company", companyField);
+        addRow(panel, gbc, 2, "Type (Tablet/Capsule/...)", medicineTypeField);
+        addRow(panel, gbc, 3, "Price", priceField);
+        addRow(panel, gbc, 4, "Quantity in Stock", quantityField);
+        addRow(panel, gbc, 5, "Reorder Level", reorderLevelField);
+        addRow(panel, gbc, 6, "Expiry Date (yyyy-mm-dd)", expiryDateField);
+        addRow(panel, gbc, 7, "Supplier", supplierCombo);
 
         JButton okButton = new JButton("OK");
         JButton cancelButton = new JButton("Cancel");
