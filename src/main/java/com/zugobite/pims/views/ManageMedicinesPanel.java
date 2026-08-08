@@ -50,7 +50,15 @@ public class ManageMedicinesPanel extends JPanel {
             };
         }
     };
-    private final JTable table = new StripedTable(tableModel);
+    private final StripedTable table = new StripedTable(tableModel);
+
+    /** Instant free-text filter across every visible column. */
+    private final JTextField filterField = new JTextField();
+    /** Drives the filter; also lets the user sort by clicking a column header. */
+    private final javax.swing.table.TableRowSorter<DefaultTableModel> sorter =
+            new javax.swing.table.TableRowSorter<>(tableModel);
+    /** Row count summary, e.g. "7 medicines - 2 low stock, 1 expiring soon". */
+    private final JLabel summaryLabel = new JLabel();
 
     public ManageMedicinesPanel(MedicineService medicineService, SupplierService supplierService) {
         this.medicineService = medicineService;
@@ -73,27 +81,137 @@ public class ManageMedicinesPanel extends JPanel {
         editButton.addActionListener(e -> openEditDialog());
         deleteButton.addActionListener(e -> deleteSelected());
 
-        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
-        toolbar.setOpaque(false);
-        toolbar.add(refreshButton);
-        toolbar.add(addButton);
-        toolbar.add(editButton);
-        toolbar.add(deleteButton);
+        JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        actions.setOpaque(false);
+        actions.add(addButton);
+        actions.add(editButton);
+        actions.add(deleteButton);
+        actions.add(refreshButton);
 
-        // The table lives inside a bordered, rounded CardPanel rather than sitting directly
-        // on the page background - the same "content in a card" composition used on every
-        // data screen in the app (see CardPanel's class comment).
-        // The table lives inside a bordered, rounded CardPanel rather than sitting directly
-        // on the page background - the same "content in a card" composition used on every
-        // data screen in the app (see CardPanel's class comment).
+        // Sorting and filtering both come from the same TableRowSorter. Clicking a header
+        // now sorts - which, combined with the numeric column classes declared above, means
+        // Price sorts by value rather than as text.
+        table.setRowSorter(sorter);
+        // Rows in a state that needs attention are tinted, so an admin scanning a long
+        // catalogue sees problems without reading a single number. Low stock (which blocks
+        // sales) outranks an approaching expiry, so it is checked first.
+        table.setRowAccent(modelRow -> {
+            if (isLowStock(modelRow)) {
+                return LOW_STOCK_TINT;
+            }
+            return isExpiringSoon(modelRow) ? EXPIRING_TINT : null;
+        });
+
+        JPanel toolbar = new JPanel(new BorderLayout(12, 0));
+        toolbar.setOpaque(false);
+        toolbar.add(actions, BorderLayout.WEST);
+        toolbar.add(buildFilterField(), BorderLayout.EAST);
+
+        summaryLabel.setFont(summaryLabel.getFont().deriveFont(Font.PLAIN, 12f));
+        summaryLabel.setForeground(UIUtils.MUTED_FOREGROUND);
+        summaryLabel.setBorder(BorderFactory.createEmptyBorder(4, 2, 0, 0));
+
+        // The table lives inside a bordered CardPanel rather than sitting directly on the
+        // page background - the same "content in a card" composition used on every data
+        // screen in the app (see CardPanel's class comment).
         CardPanel card = new CardPanel(new BorderLayout(0, 12));
         card.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         card.add(toolbar, BorderLayout.NORTH);
         card.add(UIUtils.createRoundedScrollPane(table), BorderLayout.CENTER);
+        card.add(summaryLabel, BorderLayout.SOUTH);
 
         add(card, BorderLayout.CENTER);
 
         loadMedicines();
+    }
+
+    /** Tint for rows at or below their reorder level. */
+    private static final Color LOW_STOCK_TINT = new Color(0xFE, 0xF2, 0xF2);
+    /** Tint for rows expiring within the next month. */
+    private static final Color EXPIRING_TINT = new Color(0xFF, 0xFB, 0xEB);
+
+    /**
+     * The instant filter box. Filters on every keystroke via a case-insensitive regex applied
+     * across all columns, so an admin can narrow a catalogue of thousands by name, company,
+     * or type without choosing which field to search first.
+     */
+    private JTextField buildFilterField() {
+        UIUtils.setPlaceholder(filterField, "Filter medicines...");
+        filterField.setColumns(22);
+        filterField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                applyFilter();
+            }
+        });
+        return filterField;
+    }
+
+    /** Applies the current filter text to the sorter, then refreshes the row summary. */
+    private void applyFilter() {
+        String query = filterField.getText().trim();
+        // Quote the input so a user typing regex metacharacters (a bracket in a product
+        // name, say) filters literally instead of throwing a PatternSyntaxException.
+        sorter.setRowFilter(query.isEmpty()
+                ? null
+                : javax.swing.RowFilter.regexFilter("(?i)" + java.util.regex.Pattern.quote(query)));
+        updateSummary();
+    }
+
+    /** True when the medicine on this model row is at or below its reorder level. */
+    private boolean isLowStock(int modelRow) {
+        Object stock = tableModel.getValueAt(modelRow, 5);
+        Object reorder = tableModel.getValueAt(modelRow, 6);
+        return stock instanceof Integer stockValue
+                && reorder instanceof Integer reorderValue
+                && stockValue <= reorderValue;
+    }
+
+    /** True when the medicine on this model row expires within the next month. */
+    private boolean isExpiringSoon(int modelRow) {
+        Object expiry = tableModel.getValueAt(modelRow, 7);
+        if (!(expiry instanceof LocalDate expiryDate)) {
+            return false;
+        }
+        LocalDate today = LocalDate.now();
+        return !expiryDate.isBefore(today) && !expiryDate.isAfter(today.plusMonths(1));
+    }
+
+    /** Updates the "N medicines - X low stock, Y expiring soon" line beneath the table. */
+    private void updateSummary() {
+        int total = tableModel.getRowCount();
+        int shown = table.getRowCount();
+        int lowStock = 0;
+        int expiring = 0;
+        for (int row = 0; row < total; row++) {
+            if (isLowStock(row)) {
+                lowStock++;
+            } else if (isExpiringSoon(row)) {
+                expiring++;
+            }
+        }
+
+        StringBuilder summary = new StringBuilder();
+        summary.append(shown == total
+                ? total + (total == 1 ? " medicine" : " medicines")
+                : shown + " of " + total + " medicines");
+        if (lowStock > 0) {
+            summary.append("  -  ").append(lowStock).append(" low stock");
+        }
+        if (expiring > 0) {
+            summary.append("  -  ").append(expiring).append(" expiring soon");
+        }
+        summaryLabel.setText(summary.toString());
     }
 
     /** Re-queries every medicine from the database and repopulates the table from scratch. */
@@ -107,9 +225,25 @@ public class ManageMedicinesPanel extends JPanel {
                         m.getPrice(), m.getQuantityInStock(), m.getReorderLevel(), m.getExpiryDate(), m.getSupplierId()
                 });
             }
+            updateSummary();
         } catch (SQLException e) {
             UIUtils.showError(this, "Failed to load medicines: " + e.getMessage());
         }
+    }
+
+    /**
+     * The model index of the selected row, or {@code -1} when nothing is selected.
+     *
+     * <p>Going through {@link JTable#convertRowIndexToModel} is <b>required</b>, not
+     * defensive: once a {@link javax.swing.table.TableRowSorter} is attached (for the header
+     * sorting and the filter box above), {@link JTable#getSelectedRow()} returns a position
+     * in the <em>visible</em> ordering, which no longer matches the model's row order. Using
+     * the raw view index to look up a record would silently read - and, in the delete path,
+     * destroy - a different medicine than the one highlighted on screen.</p>
+     */
+    private int selectedModelRow() {
+        int viewRow = table.getSelectedRow();
+        return viewRow < 0 ? -1 : table.convertRowIndexToModel(viewRow);
     }
 
     /**
@@ -144,7 +278,7 @@ public class ManageMedicinesPanel extends JPanel {
 
     /** Opens {@link MedicineFormDialog} pre-filled with the selected row; on confirmation, updates it. */
     private void openEditDialog() {
-        int row = table.getSelectedRow();
+        int row = selectedModelRow();
         if (row < 0) {
             UIUtils.showError(this, "Select a medicine to edit.");
             return;
@@ -174,7 +308,7 @@ public class ManageMedicinesPanel extends JPanel {
 
     /** Deletes the selected medicine after an explicit confirmation prompt (destructive action). */
     private void deleteSelected() {
-        int row = table.getSelectedRow();
+        int row = selectedModelRow();
         if (row < 0) {
             UIUtils.showError(this, "Select a medicine to delete.");
             return;

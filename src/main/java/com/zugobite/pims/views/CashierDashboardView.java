@@ -27,7 +27,8 @@ public class CashierDashboardView extends JFrame {
             new ModuleTile("Stock Check", IconKind.STOCK, 1)
     );
 
-    public CashierDashboardView(User cashier, MedicineService medicineService, SalesService salesService, Runnable onLogout) {
+    public CashierDashboardView(User cashier, MedicineService medicineService, SalesService salesService,
+                                 com.zugobite.pims.services.DashboardService dashboardService, Runnable onLogout) {
         super("HealthFirst PIMS - Cashier POS (" + cashier.getFullName() + ")");
         // Closing this window via the titlebar button quits the app, same as LoginView -
         // see that class's comment for why. Logging out is the separate, non-quitting path
@@ -40,7 +41,8 @@ public class CashierDashboardView extends JFrame {
         CardLayout cardLayout = new CardLayout();
         JPanel content = new JPanel(cardLayout);
         content.setBackground(UIUtils.BACKGROUND);
-        content.add(new ModuleHomePanel("Cashier", MODULES, index -> cardLayout.show(content, String.valueOf(index))), "home");
+        content.add(new ModuleHomePanel("Cashier", MODULES,
+                index -> cardLayout.show(content, String.valueOf(index)), dashboardService), "home");
         content.add(new PosPanel(cashier, medicineService, salesService), "0");
         content.add(new StockCheckPanel(medicineService), "1");
 

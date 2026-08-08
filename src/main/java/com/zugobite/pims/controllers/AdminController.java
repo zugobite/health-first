@@ -25,6 +25,8 @@ public class AdminController {
     private final SupplierService supplierService = new SupplierService();
     private final UserService userService = new UserService();
     private final ReportService reportService = new ReportService();
+    private final com.zugobite.pims.services.DashboardService dashboardService =
+            new com.zugobite.pims.services.DashboardService();
 
     /**
      * @param admin    the authenticated Admin this session belongs to
@@ -40,6 +42,7 @@ public class AdminController {
 
     /** Opens the Admin dashboard window. Called once by {@link LoginController} right after login. */
     public void start() {
-        new AdminDashboardView(admin, medicineService, supplierService, userService, reportService, onLogout).setVisible(true);
+        new AdminDashboardView(admin, medicineService, supplierService, userService, reportService,
+                dashboardService, onLogout).setVisible(true);
     }
 }

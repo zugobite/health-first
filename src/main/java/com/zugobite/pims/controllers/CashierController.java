@@ -23,6 +23,11 @@ public class CashierController {
     private final Runnable onLogout;
     private final MedicineService medicineService = new MedicineService();
     private final SalesService salesService = new SalesService();
+    // Read-only headline figures for the Cashier home screen. Note this is the *only*
+    // reporting-flavoured service a Cashier session constructs - it exposes aggregate
+    // counts/totals, never the per-transaction report rows Admin's Reports module shows.
+    private final com.zugobite.pims.services.DashboardService dashboardService =
+            new com.zugobite.pims.services.DashboardService();
 
     /**
      * @param cashier  the authenticated Cashier this session belongs to
@@ -38,6 +43,6 @@ public class CashierController {
 
     /** Opens the Cashier dashboard window. Called once by {@link LoginController} right after login. */
     public void start() {
-        new CashierDashboardView(cashier, medicineService, salesService, onLogout).setVisible(true);
+        new CashierDashboardView(cashier, medicineService, salesService, dashboardService, onLogout).setVisible(true);
     }
 }

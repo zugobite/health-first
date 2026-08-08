@@ -32,7 +32,8 @@ public class AdminDashboardView extends JFrame {
     );
 
     public AdminDashboardView(User admin, MedicineService medicineService, SupplierService supplierService,
-                               UserService userService, ReportService reportService, Runnable onLogout) {
+                               UserService userService, ReportService reportService,
+                               com.zugobite.pims.services.DashboardService dashboardService, Runnable onLogout) {
         super("HealthFirst PIMS - Admin Dashboard (" + admin.getFullName() + ")");
         // Closing this window via the titlebar button quits the app, same as LoginView -
         // see that class's comment for why. Logging out is the separate, non-quitting path
@@ -46,7 +47,8 @@ public class AdminDashboardView extends JFrame {
         JPanel content = new JPanel(cardLayout);
         content.setBackground(UIUtils.BACKGROUND);
 
-        content.add(new ModuleHomePanel("Admin", MODULES, index -> cardLayout.show(content, String.valueOf(index))), "home");
+        content.add(new ModuleHomePanel("Admin", MODULES,
+                index -> cardLayout.show(content, String.valueOf(index)), dashboardService), "home");
         // ManageMedicinesPanel needs SupplierService too, purely to populate the supplier
         // dropdown in its Add/Edit dialog - it never writes to the suppliers table itself.
         content.add(new ManageMedicinesPanel(medicineService, supplierService), "0");

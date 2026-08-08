@@ -407,6 +407,22 @@ public final class UIUtils {
     }
 
     /**
+     * A borderless, transparent destructive action that only reveals its red on hover — for
+     * destructive controls that live in persistent chrome (the toolbar's "Log Out") rather
+     * than in a task-focused toolbar. A solid red button is correct next to the thing it
+     * destroys; it is wrong as permanent furniture, where it would out-shout the actual work
+     * for the entire session.
+     */
+    public static void styleAsQuietDestructiveButton(JButton button) {
+        button.putClientProperty(FlatClientProperties.STYLE, String.format(
+                "%s borderWidth: 0; focusWidth: 0;" +
+                        "background: #%s; foreground: #%s; hoverBackground: #%s; pressedBackground: #%s;",
+                controlShapeStyle(), hex(BACKGROUND), hex(DESTRUCTIVE),
+                hex(DESTRUCTIVE_HOVER_BACKGROUND), hex(new Color(0xFE, 0xE2, 0xE2))
+        ));
+    }
+
+    /**
      * Wraps a data table in a FlatLaf scroll pane with a square border ({@code arc: 0}).
      * {@link com.zugobite.pims.views.CardPanel} provides the outer card outline.
      */
