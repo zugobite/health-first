@@ -1,5 +1,7 @@
 package com.zugobite.pims.views;
 
+import com.zugobite.pims.utils.UIUtils;
+
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -8,6 +10,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import java.awt.Color;
 import java.awt.Component;
+import java.math.BigDecimal;
 
 /**
  * A {@link JTable} with alternating-row ("zebra") striping and a few sensible defaults
@@ -26,11 +29,30 @@ import java.awt.Component;
  * technique for this - it runs after the real cell renderer has already set the cell's
  * content and default colors, so it only needs to override the background, and only for
  * unselected rows (selection highlighting must never be fought with by striping).</p>
+ *
+ * <p>Two extras layer on top of that: {@link BigDecimal} cells render as formatted money
+ * ({@code 1,234.56}) instead of a raw {@code toString()}, and screens can supply a
+ * {@link RowAccent} to tint whole rows that need attention - which is how Manage Medicines
+ * flags low-stock and expiring items without the user having to read every number.</p>
  */
 public class StripedTable extends JTable {
 
     private static final Color EVEN_ROW_COLOR = Color.WHITE;
     private static final Color ODD_ROW_COLOR = new Color(0xF3, 0xF6, 0xF6);
+
+    /**
+     * Optional per-row background override, used to draw attention to rows in a notable
+     * state (e.g. stock at/below reorder level, or an item expiring within the month).
+     * Implementations receive a <em>model</em> row index, so they stay correct even when the
+     * user has sorted or filtered the view.
+     */
+    @FunctionalInterface
+    public interface RowAccent {
+        /** @return the background to use for this model row, or {@code null} to keep normal striping. */
+        Color backgroundFor(int modelRow);
+    }
+
+    private RowAccent rowAccent;
 
     public StripedTable(TableModel model) {
         super(model);
@@ -42,6 +64,17 @@ public class StripedTable extends JTable {
 
         DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) getTableHeader().getDefaultRenderer();
         headerRenderer.setHorizontalAlignment(SwingConstants.LEFT);
+
+        // Registered per-class rather than per-column so any table whose model declares a
+        // BigDecimal column (via getColumnClass) gets money formatting for free, with no
+        // extra wiring on each screen.
+        setDefaultRenderer(BigDecimal.class, new MoneyRenderer());
+    }
+
+    /** Installs a row-tinting rule; pass {@code null} to go back to plain zebra striping. */
+    public void setRowAccent(RowAccent rowAccent) {
+        this.rowAccent = rowAccent;
+        repaint();
     }
 
     @Override
@@ -51,8 +84,21 @@ public class StripedTable extends JTable {
             label.setHorizontalAlignment(SwingConstants.LEFT);
         }
         if (!isRowSelected(row)) {
-            component.setBackground(row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR);
+            Color accent = rowAccent == null ? null : rowAccent.backgroundFor(convertRowIndexToModel(row));
+            component.setBackground(accent != null ? accent : (row % 2 == 0 ? EVEN_ROW_COLOR : ODD_ROW_COLOR));
         }
         return component;
+    }
+
+    /**
+     * Renders {@link BigDecimal} cells as grouped 2-decimal money ({@code 1,234.56}) while
+     * leaving the model's value a real {@code BigDecimal} — so sorting a price column still
+     * sorts numerically rather than lexicographically ("9.00" before "10.00", not after).
+     */
+    private static final class MoneyRenderer extends DefaultTableCellRenderer {
+        @Override
+        protected void setValue(Object value) {
+            setText(value instanceof BigDecimal amount ? UIUtils.formatAmount(amount) : "");
+        }
     }
 }

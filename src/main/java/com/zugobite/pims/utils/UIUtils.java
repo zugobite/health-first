@@ -261,6 +261,47 @@ public final class UIUtils {
         }
     }
 
+    // ---------------------------------------------------------------------
+    // Money formatting - one definition of "what a price looks like in this app", used by
+    // table cell renderers, the POS totals, and the on-screen bill alike. Without this,
+    // amounts render as raw BigDecimal.toString() ("25.99", "1234.5"), which reads as debug
+    // output rather than a currency figure a pharmacy would put in front of a customer.
+    // ---------------------------------------------------------------------
+
+    /** Grouped, 2-decimal number format ({@code 1,234.56}) shared by both money formatters below. */
+    private static final java.text.DecimalFormat MONEY_FORMAT;
+
+    static {
+        // Built from an explicitly-constructed symbol set rather than the JVM default locale:
+        // on a machine defaulting to, say, German, the default symbols would render
+        // "1.234,56" and quietly change what every price in the app looks like.
+        java.text.DecimalFormatSymbols symbols = new java.text.DecimalFormatSymbols(java.util.Locale.UK);
+        symbols.setGroupingSeparator(',');
+        symbols.setDecimalSeparator('.');
+        MONEY_FORMAT = new java.text.DecimalFormat("#,##0.00", symbols);
+    }
+
+    /** South African Rand symbol, prefixed by {@link #formatCurrency}. */
+    public static final String CURRENCY_SYMBOL = "R";
+
+    /**
+     * Formats an amount for display with the currency symbol, e.g. {@code R 1,234.56}.
+     * Null-safe (renders as {@code R 0.00}) so callers can pass a not-yet-populated total
+     * without a null check at every call site.
+     */
+    public static String formatCurrency(java.math.BigDecimal amount) {
+        return CURRENCY_SYMBOL + " " + formatAmount(amount);
+    }
+
+    /**
+     * Formats an amount without the currency symbol, e.g. {@code 1,234.56} — for table
+     * columns whose header already says "Price"/"Total", where repeating "R" on every row
+     * would be visual noise.
+     */
+    public static String formatAmount(java.math.BigDecimal amount) {
+        return MONEY_FORMAT.format(amount == null ? java.math.BigDecimal.ZERO : amount);
+    }
+
     /**
      * Converts a raw map key or DB-style column name (camelCase like {@code totalAmount},
      * or snake_case like {@code quantity_in_stock}) into a human-readable header, e.g.
