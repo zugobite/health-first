@@ -111,7 +111,7 @@ public final class UIUtils {
     public static final ModuleAccent MODULE_STOCK = new ModuleAccent(
             new Color(0xF0, 0xFA, 0xF9), new Color(0xE0, 0xF2, 0xF0), PRIMARY_HOVER);
 
-    /** Corner radius for controls and cards — 0 for square corners throughout the UI. */
+    /** Corner radius for controls and cards - 0 for square corners throughout the UI. */
     private static final int RADIUS = 0;
     /** Corner arc for cards / tiles (Java2D arc width/height). Kept in sync with {@link #RADIUS}. */
     public static final int CARD_RADIUS = RADIUS;
@@ -294,7 +294,7 @@ public final class UIUtils {
     }
 
     /**
-     * Formats an amount without the currency symbol, e.g. {@code 1,234.56} — for table
+     * Formats an amount without the currency symbol, e.g. {@code 1,234.56} - for table
      * columns whose header already says "Price"/"Total", where repeating "R" on every row
      * would be visual noise.
      */
@@ -407,7 +407,7 @@ public final class UIUtils {
     }
 
     /**
-     * A borderless, transparent destructive action that only reveals its red on hover — for
+     * A borderless, transparent destructive action that only reveals its red on hover - for
      * destructive controls that live in persistent chrome (the toolbar's "Log Out") rather
      * than in a task-focused toolbar. A solid red button is correct next to the thing it
      * destroys; it is wrong as permanent furniture, where it would out-shout the actual work
@@ -438,7 +438,7 @@ public final class UIUtils {
         }
         if (view instanceof javax.swing.JTable) {
             scroll.setBorder(UIManager.getBorder("Table.scrollPaneBorder"));
-            // arc must stay 0 — any positive value adds left/right viewport padding.
+            // arc must stay 0 - any positive value adds left/right viewport padding.
             scroll.putClientProperty(FlatClientProperties.STYLE, "arc: 0");
         } else {
             scroll.setBorder(null);

@@ -14,16 +14,16 @@ import java.util.List;
  * {@link com.zugobite.pims.services.SalesService#checkout} to be persisted.
  *
  * <p>{@code saleId} and {@code saleDate} start unset (0 / {@code null}) and only become
- * meaningful *after* {@code checkout()} has run — the database assigns the `sale_id` via
+ * meaningful *after* {@code checkout()} has run - the database assigns the `sale_id` via
  * AUTO_INCREMENT and the `sale_date` via {@code DEFAULT CURRENT_TIMESTAMP}, so this object
  * can't know either value up front. {@code SalesService} sets both once it reads them back.</p>
  *
- * <p><b>Mutability model:</b> {@link SaleItem} is immutable, but a cart is not — a cashier
+ * <p><b>Mutability model:</b> {@link SaleItem} is immutable, but a cart is not - a cashier
  * routinely corrects a quantity or voids a line mid-sale. So quantity changes are expressed
  * as "replace the item at this index with an identical one at a new quantity"
  * ({@link #setItemQuantity}) rather than by mutating a {@code SaleItem} in place. Every
  * mutator funnels through {@link #recalculateTotal()}, which is what guarantees
- * {@link #getTotalAmount()} can never drift out of sync with {@link #getItems()} — the bug
+ * {@link #getTotalAmount()} can never drift out of sync with {@link #getItems()} - the bug
  * that an add-only API quietly avoided but that removal/editing would otherwise introduce.</p>
  */
 public class Sale {
@@ -51,7 +51,7 @@ public class Sale {
 
     /**
      * Replaces the line at {@code index} with an otherwise-identical line at
-     * {@code newQuantity} — how an inline quantity edit in the cart table is applied.
+     * {@code newQuantity} - how an inline quantity edit in the cart table is applied.
      * A {@code newQuantity} of zero or less removes the line outright, matching the
      * behaviour cashiers expect when they clear a quantity cell to void an item.
      */
@@ -86,7 +86,7 @@ public class Sale {
         return -1;
     }
 
-    /** Total number of physical units in the cart (summed across lines) — shown as the cart's item count. */
+    /** Total number of physical units in the cart (summed across lines) - shown as the cart's item count. */
     public int getTotalQuantity() {
         int total = 0;
         for (SaleItem item : items) {
@@ -137,7 +137,7 @@ public class Sale {
     /**
      * @return an unmodifiable view of the cart's lines. Unmodifiable on purpose: every
      *         mutation must go through this class's own methods so {@link #recalculateTotal()}
-     *         always runs — a caller editing the returned list directly would silently
+     *         always runs - a caller editing the returned list directly would silently
      *         desynchronise the total from the items.
      */
     public List<SaleItem> getItems() {

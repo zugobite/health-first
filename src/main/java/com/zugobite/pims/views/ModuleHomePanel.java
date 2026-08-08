@@ -178,7 +178,7 @@ public class ModuleHomePanel extends JPanel {
     }
 
     /**
-     * The module tile grid. Uses {@code GridLayout(0, GRID_COLUMNS, ...)} — a <b>zero</b> row
+     * The module tile grid. Uses {@code GridLayout(0, GRID_COLUMNS, ...)} - a <b>zero</b> row
      * count with a fixed column count. This matters: when {@link GridLayout} is given a
      * non-zero row count it honours the rows and <em>derives</em> the columns, so passing
      * {@code (2, 3)} for four tiles silently produces a 2x2 grid rather than the intended
@@ -279,7 +279,7 @@ public class ModuleHomePanel extends JPanel {
         return tilePanel;
     }
 
-    /** The tinted square holding a module's icon — the tile's only splash of colour at rest. */
+    /** The tinted square holding a module's icon - the tile's only splash of colour at rest. */
     private JPanel buildIconTile(ModuleTile tile, ModuleAccent accent) {
         JPanel iconTile = new JPanel(new BorderLayout()) {
             @Override
@@ -311,7 +311,7 @@ public class ModuleHomePanel extends JPanel {
      * Centres {@code content} horizontally and stops it growing past
      * {@value #MAX_CONTENT_WIDTH}px. Implemented with {@link BoxLayout} specifically because
      * it is one of the few Swing layout managers that honours a component's
-     * {@code maximumSize} — {@link java.awt.GridBagLayout} with a horizontal fill would
+     * {@code maximumSize} - {@link java.awt.GridBagLayout} with a horizontal fill would
      * ignore the cap and stretch the content across the full window.
      */
     private JComponent centeredMaxWidth(JComponent content) {
@@ -332,7 +332,7 @@ public class ModuleHomePanel extends JPanel {
      * database round trips: doing them inline would freeze the window for the duration, and
      * on an unreachable database would hang the whole app rather than just this one row.
      *
-     * <p>On failure the stat row simply stays hidden — a cashier must still be able to reach
+     * <p>On failure the stat row simply stays hidden - a cashier must still be able to reach
      * the POS module even if the reporting queries are unavailable, so this deliberately does
      * not surface a blocking error dialog.</p>
      */

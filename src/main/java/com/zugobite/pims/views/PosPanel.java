@@ -188,7 +188,7 @@ public class PosPanel extends JPanel {
 
     /** Left card: the live-filtered medicine catalogue. */
     private JComponent buildCatalogueCard() {
-        UIUtils.setPlaceholder(searchField, "Search by medicine name...");
+        UIUtils.setPlaceholder(searchField, "Search");
         searchField.putClientProperty("JTextField.leadingIcon",
                 AppIcons.lucide(AppIcons.CLIPBOARD, 15, UIUtils.MUTED_FOREGROUND));
         // Live filtering: every keystroke re-queries. The catalogue of a single pharmacy is

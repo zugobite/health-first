@@ -14,7 +14,7 @@ import java.sql.SQLException;
  *
  * <p>Distinct from {@link ReportService}, which answers "give me every row matching X" for
  * an on-screen table the user then reads, exports, or prints. This class answers "give me
- * one number" — the aggregates are computed by MySQL ({@code SUM}/{@code COUNT}) and come
+ * one number" - the aggregates are computed by MySQL ({@code SUM}/{@code COUNT}) and come
  * back as scalars, so opening the home screen costs a handful of cheap aggregate queries
  * rather than pulling whole result sets across the wire just to count them in Java.</p>
  *
@@ -47,7 +47,7 @@ public class DashboardService {
 
     /**
      * Runs every headline aggregate over a single shared {@link Connection}, rather than one
-     * connection per figure — six sequential {@code DriverManager.getConnection()} round
+     * connection per figure - six sequential {@code DriverManager.getConnection()} round
      * trips would visibly delay the home screen on a slow network for no benefit.
      *
      * @throws SQLException if the database is unreachable; the caller
@@ -79,7 +79,7 @@ public class DashboardService {
     /**
      * Runs a single-row, single-column {@code SUM(...)} query and returns the scalar. Every
      * such query in this class wraps its SUM in {@code COALESCE(..., 0)}, so an empty table
-     * (a pharmacy's very first day, before any sale) yields zero rather than SQL NULL — which
+     * (a pharmacy's very first day, before any sale) yields zero rather than SQL NULL - which
      * is why this can safely return a non-null {@link BigDecimal} without a null guard here.
      */
     private BigDecimal queryDecimal(Connection conn, String sql) throws SQLException {

@@ -30,7 +30,7 @@ import java.awt.RenderingHints;
  *
  * <p>The emphasis here is deliberately <em>low</em>. Application chrome frames the work; it
  * should never out-shout it. An earlier revision rendered "Log Out" as a solid red button,
- * which made the single least-used control the loudest thing on the screen — the visual
+ * which made the single least-used control the loudest thing on the screen - the visual
  * equivalent of shouting the exit sign. Both session actions are now ghost-styled, with
  * "Log Out" picking up its red only on hover, so the destructive intent is still unmistakable
  * at the moment it matters without dominating the interface for the rest of the shift.</p>
@@ -166,7 +166,7 @@ final class DashboardToolbar extends JPanel {
     }
 
     /**
-     * A circular initials badge, drawn procedurally rather than loaded from an image — the
+     * A circular initials badge, drawn procedurally rather than loaded from an image - the
      * standard stand-in for a user photo in software that has no photos to show. Derives up
      * to two initials from the user's full name.
      */

@@ -16,7 +16,7 @@ import java.awt.Font;
 
 /**
  * A single headline metric on a dashboard home screen: a small uppercase caption, a large
- * value, and a one-line supporting note — e.g. "TODAY'S SALES / R 4,120.50 / 18 transactions".
+ * value, and a one-line supporting note - e.g. "TODAY'S SALES / R 4,120.50 / 18 transactions".
  *
  * <p>This is the component that most changes how the app reads. A launcher screen of nothing
  * but navigation tiles looks like a student project; the same screen led by live figures
@@ -25,18 +25,18 @@ import java.awt.Font;
  *
  * <p>Metrics that represent a problem needing attention (stock at reorder level, stock
  * expiring within the month) can be marked as {@link Tone#WARNING} or {@link Tone#DANGER},
- * which tints the value and draws a colored rule down the card's leading edge — so a manager
+ * which tints the value and draws a colored rule down the card's leading edge - so a manager
  * spots trouble from across the room without reading a single number.</p>
  */
 public class StatCard extends CardPanel {
 
     /** Visual emphasis for a metric's value and leading accent rule. */
     public enum Tone {
-        /** Ordinary informational figure — neutral dark text, brand-teal rule. */
+        /** Ordinary informational figure - neutral dark text, brand-teal rule. */
         NEUTRAL(UIUtils.FOREGROUND, UIUtils.PRIMARY),
-        /** Needs attention soon (e.g. items expiring this month) — amber. */
+        /** Needs attention soon (e.g. items expiring this month) - amber. */
         WARNING(new Color(0xB4, 0x53, 0x09), new Color(0xF5, 0x9E, 0x0B)),
-        /** Needs attention now (e.g. items at/below reorder level) — red. */
+        /** Needs attention now (e.g. items at/below reorder level) - red. */
         DANGER(UIUtils.DESTRUCTIVE, UIUtils.DESTRUCTIVE);
 
         private final Color valueColor;

@@ -92,7 +92,7 @@ public class StripedTable extends JTable {
 
     /**
      * Renders {@link BigDecimal} cells as grouped 2-decimal money ({@code 1,234.56}) while
-     * leaving the model's value a real {@code BigDecimal} — so sorting a price column still
+     * leaving the model's value a real {@code BigDecimal} - so sorting a price column still
      * sorts numerically rather than lexicographically ("9.00" before "10.00", not after).
      */
     private static final class MoneyRenderer extends DefaultTableCellRenderer {
