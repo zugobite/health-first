@@ -209,7 +209,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## Disclaimer
 
-This project is created **purely for educational and portfolio demonstration purposes** to showcase Java development skills and software engineering knowledge (Programming 732 Assignment 1, Richfield GIT).
+This project is created **purely for educational and portfolio demonstration purposes** to showcase Java development skills and software engineering knowledge (Programming 732 / PRO732 Assignment 1, Richfield GIT).
+
+**Author:** Zascia Hugo · **Student Number:** 402111581
 
 **Important notices:**
 

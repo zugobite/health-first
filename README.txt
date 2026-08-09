@@ -3,8 +3,9 @@
  User Manual
 ================================================================================
 
-Programming 732 Assignment 1 (Richfield GIT)
-Author: Zascia Hugo
+Programming 732 Assignment 1 (Richfield GIT) - PRO732
+Author         : Zascia Hugo
+Student Number : 402111581
 
 
 --------------------------------------------------------------------------------
@@ -71,18 +72,15 @@ why that is an intentional, documented decision for this assignment).
        (URL, USER, PASSWORD constants near the top of the file), then
        recompile if running from source.
 
-    4. Launch the application (Java 17+ must be installed):
+    4. Launch the application on Windows (Java 17+ must be installed):
 
-           Windows : double-click run.bat
-                     (or zasciahugo_pims.exe if you have the Launch4j
-                     wrapper built - same jar underneath)
+           Double-click zasciahugo_pims.exe
+           (fallback: run.bat)
 
-           macOS / Linux :
-                     ./run.sh
-
-       Both launchers run zasciahugo_pims.jar with the bundled lib/
-       jars on the classpath. You still need a local MySQL instance
-       loaded from database.sql (step 2) - the database is not embedded.
+       The .exe launches zasciahugo_pims.jar with the bundled lib/ jars.
+       You still need a local MySQL instance loaded from database.sql
+       (step 2) - the database script is bundled in this zip for easy
+       setup; MySQL Server itself is not embedded.
 
        Running from a fresh source checkout instead: see README.md for
        the full javac/java classpath commands.

@@ -1,4 +1,5 @@
 -- PIMS (HealthFirst) - schema + seed data
+-- Author: Zascia Hugo · Student Number: 402111581 · PRO732
 -- Load with: mysql -u root -p < database.sql
 
 CREATE DATABASE IF NOT EXISTS pims_db;

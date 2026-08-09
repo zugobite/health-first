@@ -4,6 +4,8 @@
 >
 > Scenario client: a local pharmacy called **"HealthFirst"**.
 >
+> Author: Zascia Hugo · Student Number: 402111581 · Course: PRO732
+>
 > This document defines the complete functional, technical, and submission requirements for the PIMS platform. Converted from Programming 732 Assignment 1 (Richfield GIT).
 
 ## 1. Overview

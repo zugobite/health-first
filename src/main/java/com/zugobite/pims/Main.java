@@ -21,6 +21,9 @@ import java.util.Locale;
  * after loading {@code database.sql} into a local MySQL instance (see the credentials in
  * {@link com.zugobite.pims.data.DBConnection}). On macOS, {@code Main} re-launches the JVM
  * with {@code -Xdock:name} so the Dock shows {@link #APP_NAME} instead of {@code java}.</p>
+ *
+ * @author Zascia Hugo (402111581)
+ * @see AppInfo
  */
 public class Main {
 

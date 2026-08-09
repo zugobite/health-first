@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `PosPanel`: the POS total-due figure and the change-due readout were rendering blank
   (only the "TOTAL DUE"/tender-field chrome was visible, with no amount underneath) because
   their containing blocks' `maximumSize` was computed from `totalLabel`/`changeLabel`'s
-  *empty-string* preferred size before `refreshCart()` ever set real text — under FlatLaf an
+  *empty-string* preferred size before `refreshCart()` ever set real text - under FlatLaf an
   empty `JLabel` reports a near-zero height, permanently capping the block too short for the
   30pt total once real text arrived. Fixed by initialising both labels with real-shaped text
   (`"R 0.00"` / `" "`) instead of `""`, so the initial size measurement is representative.

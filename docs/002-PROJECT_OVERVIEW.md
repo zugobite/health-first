@@ -1,5 +1,7 @@
 # Project Overview
 
+**Author:** Zascia Hugo · **Student Number:** 402111581 · **Course:** PRO732 (Programming 732, Richfield GIT)
+
 ## Architecture
 
 PIMS is a Java Swing desktop Pharmacy Inventory Management System backed by MySQL via JDBC. The application follows object-oriented principles with a clear separation of concerns across well-defined packages.

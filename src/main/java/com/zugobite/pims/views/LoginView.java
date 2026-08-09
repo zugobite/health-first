@@ -1,5 +1,6 @@
 package com.zugobite.pims.views;
 
+import com.zugobite.pims.AppInfo;
 import com.zugobite.pims.controllers.LoginController;
 import com.zugobite.pims.utils.UIUtils;
 
@@ -78,10 +79,20 @@ public class LoginView extends JFrame {
         // The card floats on a muted page background with generous margin around it - the
         // "centered auth card" composition, rather than the form filling the whole window
         // edge-to-edge the way plain Swing forms usually do.
-        JPanel page = new JPanel(new GridBagLayout());
+        JPanel page = new JPanel(new BorderLayout());
         page.setBackground(UIUtils.MUTED_BACKGROUND);
-        page.setBorder(BorderFactory.createEmptyBorder(48, 48, 48, 48));
-        page.add(card);
+        page.setBorder(BorderFactory.createEmptyBorder(48, 48, 24, 48));
+
+        JPanel center = new JPanel(new GridBagLayout());
+        center.setOpaque(false);
+        center.add(card);
+        page.add(center, BorderLayout.CENTER);
+
+        JLabel credit = new JLabel(AppInfo.CREDIT_LINE, SwingConstants.CENTER);
+        credit.setFont(credit.getFont().deriveFont(Font.PLAIN, 11f));
+        credit.setForeground(UIUtils.MUTED_FOREGROUND);
+        credit.setBorder(BorderFactory.createEmptyBorder(16, 0, 0, 0));
+        page.add(credit, BorderLayout.SOUTH);
 
         // Lets the user press Enter from either field instead of having to click the button.
         getRootPane().setDefaultButton(loginButton);

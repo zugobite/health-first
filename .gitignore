@@ -40,4 +40,8 @@ dist/
 dist-mac/
 dist-win/
 tools/
+packaging-input/
 *.zip
+
+# Temporary iconutil output
+branding/AppIcon.iconset/
