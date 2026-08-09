@@ -30,6 +30,12 @@ public class Main {
     /** Set on the child JVM after a macOS Dock-name re-launch so we do not loop. */
     private static final String DOCK_CONFIGURED_PROP = "healthfirst.dock.configured";
 
+    /**
+     * Boots the desktop app. On macOS may re-exec the JVM once with {@code -Xdock:name}
+     * (forwarding {@code args}) and return early; otherwise sets the Apple application
+     * name and, on the EDT, installs FlatLaf, applies the Dock icon, and opens
+     * {@link LoginController}.
+     */
     public static void main(String[] args) {
         // -Xdock:name can only be set at JVM start. If the user launched without it (the
         // usual `java -cp … Main` flow), re-exec once on macOS so the Dock label is correct.

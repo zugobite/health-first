@@ -144,8 +144,15 @@ public class PosPanel extends JPanel {
     private final StripedTable cartTable = new StripedTable(cartModel);
 
     private final JLabel itemCountLabel = new JLabel();
-    private final JLabel totalLabel = new JLabel();
-    private final JLabel changeLabel = new JLabel();
+    // Initialised with a real formatted zero rather than an empty string: buildTotalsBlock()
+    // measures this label's preferred size to compute the totals block's maximumSize before
+    // refreshCart() ever runs, and an empty JLabel reports a near-zero height under FlatLaf -
+    // which then permanently caps the block too short to show the 30pt total once real text
+    // (e.g. "R 172.47") is set later. Starting from real-shaped text avoids the whole trap.
+    private final JLabel totalLabel = new JLabel(UIUtils.formatCurrency(BigDecimal.ZERO));
+    // Starts as a single space, not "" - matches refreshChangeDue()'s own blank-tender state
+    // and avoids the same preferred-size-before-real-content trap documented on totalLabel above.
+    private final JLabel changeLabel = new JLabel(" ");
     private final JButton checkoutButton = new JButton("Checkout  (F9)");
 
     /**
@@ -158,6 +165,11 @@ public class PosPanel extends JPanel {
     /** The in-progress cart. Replaced wholesale by {@link #clearCart()} at the end of a sale. */
     private Sale currentSale;
 
+    /**
+     * Builds the full POS layout for {@code cashier}: empty {@link Sale} cart, horizontal
+     * split (catalogue | till), keyboard shortcuts, then {@code refreshSearch()} /
+     * {@code refreshCart()} so catalogue, cart, and totals render immediately.
+     */
     public PosPanel(User cashier, MedicineService medicineService, SalesService salesService) {
         this.cashier = cashier;
         this.medicineService = medicineService;

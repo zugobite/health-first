@@ -54,6 +54,11 @@ public class ReportsPanel extends JPanel {
     private List<Map<String, Object>> lastRows;
     private String lastReportTitle;
 
+    /**
+     * Admin reports UI: report-type combo (Sales / Item-Wise / Low Stock / Expiry), Run,
+     * and Export PDF/Excel. Owns a {@link com.zugobite.pims.services.ReportExportService}.
+     * The table stays empty until the user runs a report (no auto-run on open).
+     */
     public ReportsPanel(ReportService reportService) {
         this.reportService = reportService;
         setLayout(new BorderLayout());

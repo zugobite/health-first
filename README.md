@@ -77,7 +77,16 @@ find src -name "*.java" | xargs javac -cp "$CP" -d out
 java -Xdock:name="HealthFirst PIMS" -cp "out:src/main/resources:$CP" com.zugobite.pims.Main
 ```
 
-Default credentials (from seed data): `admin/admin123` (Admin), `cashier/cash123` (Cashier).
+### Default Credentials
+
+Seeded by `database.sql` - use whichever role you want to test:
+
+| Role        | Username  | Password   |
+| ----------- | --------- | ---------- |
+| **Admin**   | `admin`   | `admin123` |
+| **Cashier** | `cashier` | `cash123`  |
+
+See [README.txt](README.txt) for the full plain-text user manual (also the submission deliverable required alongside `/src`, `database.sql`, and `/screenshots`).
 
 ## Documentation
 
@@ -140,12 +149,16 @@ health-first/
 ├── docs/                               # Developer documentation
 │   ├── 001-APPLICATION_REQUIREMENTS.md
 │   └── 002-PROJECT_OVERVIEW.md
+├── screenshots/                        # Submission screenshots, split by role's login flow
+│   ├── admin/                          # 01-login -> dashboard -> medicines/suppliers/users -> 4 reports
+│   └── cashier/                        # 01-dashboard -> POS (empty, then cart) -> bill -> stock check
 ├── database.sql                        # CREATE DATABASE / CREATE TABLE / seed INSERTs
 ├── .gitignore                          # Git ignore rules
 ├── CHANGELOG.md                        # Version history
 ├── CONTRIBUTING.md                     # Contribution guidelines
 ├── LICENSE                             # MIT License
-└── README.md
+├── README.md                           # This file (developer-facing)
+└── README.txt                          # Plain-text user manual + default credentials (submission deliverable)
 ```
 
 ## Class Reference

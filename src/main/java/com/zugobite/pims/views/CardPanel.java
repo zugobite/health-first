@@ -20,10 +20,16 @@ import java.awt.RenderingHints;
  */
 public class CardPanel extends JPanel {
 
+    /** Creates a card with the panel's default layout manager. */
     public CardPanel() {
         this(null);
     }
 
+    /**
+     * Creates a card with an optional layout. Sets opaque {@code false} and background
+     * {@link UIUtils#BACKGROUND} so the fill comes from custom paint rather than Swing's
+     * default opaque fill.
+     */
     public CardPanel(LayoutManager layout) {
         if (layout != null) {
             setLayout(layout);
@@ -48,6 +54,10 @@ public class CardPanel extends JPanel {
         g2.dispose();
     }
 
+    /**
+     * Paints component, border, then children, and finally a 1px
+     * {@link UIUtils#BORDER_COLOR} rectangle so opaque table content cannot cover the card edge.
+     */
     @Override
     public void paint(Graphics g) {
         paintComponent(g);

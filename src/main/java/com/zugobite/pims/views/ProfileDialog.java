@@ -18,6 +18,10 @@ import java.awt.*;
  */
 public class ProfileDialog extends JDialog {
 
+    /**
+     * Modal read-only "My Profile" dialog showing full name, username, role, and user ID
+     * as labels (Close disposes; no save/edit). Packs, non-resizable, centered on {@code owner}.
+     */
     public ProfileDialog(Frame owner, User user) {
         super(owner, "My Profile", true);
 

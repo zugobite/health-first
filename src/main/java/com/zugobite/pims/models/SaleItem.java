@@ -23,6 +23,11 @@ public class SaleItem {
     private final int quantitySold;
     private final BigDecimal priceAtSale;
 
+    /**
+     * Creates an immutable cart/receipt line. {@code priceAtSale} should be the unit
+     * price at the moment the item is added (snapshot of {@link Medicine#getPrice()}),
+     * not looked up again later.
+     */
     public SaleItem(int medicineId, String medicineName, int quantitySold, BigDecimal priceAtSale) {
         this.medicineId = medicineId;
         this.medicineName = medicineName;

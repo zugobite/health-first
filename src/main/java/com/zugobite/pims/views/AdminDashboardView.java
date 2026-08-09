@@ -31,6 +31,12 @@ public class AdminDashboardView extends JFrame {
             new ModuleTile("Reports", IconKind.REPORTS, 3)
     );
 
+    /**
+     * Assembles the Admin shell: {@code EXIT_ON_CLOSE} frame with app icon, a
+     * {@link CardLayout} of home ({@link ModuleHomePanel} with live stats) plus modules
+     * 0–3 (medicines, suppliers, users, reports), and a {@link DashboardToolbar} whose
+     * Home shows the {@code "home"} card and Log Out runs {@code onLogout}. Starts on home.
+     */
     public AdminDashboardView(User admin, MedicineService medicineService, SupplierService supplierService,
                                UserService userService, ReportService reportService,
                                com.zugobite.pims.services.DashboardService dashboardService, Runnable onLogout) {

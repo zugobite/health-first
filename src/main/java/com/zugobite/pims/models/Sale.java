@@ -34,6 +34,13 @@ public class Sale {
     private final int userId;
     private final List<SaleItem> items = new ArrayList<>();
 
+    /**
+     * Starts an in-progress cart for the cashier identified by {@code userId}.
+     * {@code saleId} stays 0 and {@code saleDate} stays {@code null} until
+     * {@link com.zugobite.pims.services.SalesService#checkout} persists the sale and
+     * fills them from the database. The items list starts empty and
+     * {@code totalAmount} is {@link BigDecimal#ZERO}.
+     */
     public Sale(int userId) {
         this.userId = userId;
         this.totalAmount = BigDecimal.ZERO;

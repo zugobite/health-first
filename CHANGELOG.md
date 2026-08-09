@@ -9,8 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `PosPanel`: the POS total-due figure and the change-due readout were rendering blank
+  (only the "TOTAL DUE"/tender-field chrome was visible, with no amount underneath) because
+  their containing blocks' `maximumSize` was computed from `totalLabel`/`changeLabel`'s
+  *empty-string* preferred size before `refreshCart()` ever set real text — under FlatLaf an
+  empty `JLabel` reports a near-zero height, permanently capping the block too short for the
+  30pt total once real text arrived. Fixed by initialising both labels with real-shaped text
+  (`"R 0.00"` / `" "`) instead of `""`, so the initial size measurement is representative.
+
 ### Added
 
+- `/screenshots`: the submission deliverable's screenshot set, captured end-to-end against a
+  live local MySQL instance and organised into `admin/` and `cashier/` subfolders, each
+  numbered in the order that role's own login flow visits the screens:
+  - `admin/`: login → dashboard overview (live stats + module grid) → Manage Medicines
+    (filter box, low-stock/expiring row tinting) → Manage Suppliers → Manage Users → all
+    four reports (Sales, Item-Wise, Low Stock, Expiry), the first two showing a real
+    transaction rung up during capture
+  - `cashier/`: dashboard overview → POS with an empty cart → POS with an item in the cart
+    → the generated Bill window → the native "Save as PDF" dialog → Stock Check before and
+    after a search
+
+- `README.txt`: the plain-text user manual + default-credentials deliverable PLAN.md's
+  submission checklist requires, alongside `/src`, `database.sql`, and `/screenshots`.
+  Covers login credentials for both seeded accounts, first-time MySQL setup, a walkthrough
+  of every Admin/Cashier screen, grader-facing notes (PreparedStatement usage, the
+  intentional plaintext-password decision, the transactional checkout), and troubleshooting.
+  `README.md` now links to it and shows the same credentials as a table.
 - Full UI redesign toward an "enterprise SaaS dashboard" visual language (a Swing/FlatLaf
   approximation of shadcn/ui's neutral, card-based design system - ShadCN itself is a
   React/Tailwind library with no Java equivalent, so this reproduces its *look*, not the

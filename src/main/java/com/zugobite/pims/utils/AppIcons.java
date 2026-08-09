@@ -39,6 +39,10 @@ public final class AppIcons {
         return sized;
     }
 
+    /**
+     * Convenience overload of {@link #lucide(String, int, Color)} that tints the icon
+     * with {@link UIUtils#PRIMARY}.
+     */
     public static Icon lucide(String name, int size) {
         return lucide(name, size, UIUtils.PRIMARY);
     }

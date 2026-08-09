@@ -22,6 +22,11 @@ public class CashierFormDialog extends JDialog {
 
     private Optional<CashierInput> result = Optional.empty();
 
+    /**
+     * Modal "Add Cashier" dialog owned by {@code owner}. Builds username/password/full-name
+     * fields, packs, and centers. OK validates and sets {@link #getResult()}; Cancel disposes
+     * without a result.
+     */
     public CashierFormDialog(Frame owner) {
         super(owner, "Add Cashier", true);
         setContentPane(buildFormPanel());

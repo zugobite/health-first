@@ -60,6 +60,12 @@ public class ManageMedicinesPanel extends JPanel {
     /** Row count summary, e.g. "7 medicines - 2 low stock, 1 expiring soon". */
     private final JLabel summaryLabel = new JLabel();
 
+    /**
+     * Admin medicines CRUD UI: Add/Edit/Delete/Refresh toolbar, name filter,
+     * {@link StripedTable} with low-stock/expiry row accents, and a summary label.
+     * {@code supplierService} only populates the supplier dropdown in the form dialog.
+     * Calls {@link #loadMedicines()} so the table is not empty on first show.
+     */
     public ManageMedicinesPanel(MedicineService medicineService, SupplierService supplierService) {
         this.medicineService = medicineService;
         this.supplierService = supplierService;

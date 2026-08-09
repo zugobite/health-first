@@ -23,6 +23,12 @@ public class LoginView extends JFrame {
     private final JTextField usernameField = new JTextField(20);
     private final JPasswordField passwordField = new JPasswordField(20);
 
+    /**
+     * Builds the login frame ({@code EXIT_ON_CLOSE}, non-resizable, app icon) with a
+     * centered auth card. Log In (also the root-pane default button) calls
+     * {@link LoginController#handleLogin} with the trimmed username and password string;
+     * this view does not touch the database itself.
+     */
     public LoginView(LoginController controller) {
         super("HealthFirst PIMS - Login");
         // EXIT_ON_CLOSE is correct here for the same reason it's correct on the dashboards

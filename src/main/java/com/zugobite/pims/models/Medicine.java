@@ -25,6 +25,11 @@ public class Medicine {
     private LocalDate expiryDate;
     private int supplierId;
 
+    /**
+     * Builds a medicine from a {@code medicines} row (or from form fields before insert).
+     * On insert, {@code medicineId} is ignored - MySQL assigns it via AUTO_INCREMENT.
+     * {@code expiryDate} may be {@code null} when the DB column is null.
+     */
     public Medicine(int medicineId, String name, String company, String medicineType, BigDecimal price,
                      int quantityInStock, int reorderLevel, LocalDate expiryDate, int supplierId) {
         this.medicineId = medicineId;

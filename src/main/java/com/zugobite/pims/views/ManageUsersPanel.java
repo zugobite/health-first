@@ -42,6 +42,10 @@ public class ManageUsersPanel extends JPanel {
     };
     private final JTable table = new StripedTable(tableModel);
 
+    /**
+     * Admin Cashier-account management UI (Refresh/Add/Delete; no Edit). Calls
+     * {@link #loadCashiers()} on construct so the table is populated immediately.
+     */
     public ManageUsersPanel(UserService userService) {
         this.userService = userService;
         setLayout(new BorderLayout());

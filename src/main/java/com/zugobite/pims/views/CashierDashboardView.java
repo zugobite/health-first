@@ -27,6 +27,12 @@ public class CashierDashboardView extends JFrame {
             new ModuleTile("Stock Check", IconKind.STOCK, 1)
     );
 
+    /**
+     * Assembles the Cashier shell (same CardLayout + toolbar pattern as
+     * {@link AdminDashboardView}), but only mounts {@link PosPanel} and
+     * {@link StockCheckPanel} so manage/report screens are never constructed for this role.
+     * Starts on the home card; Log Out runs {@code onLogout}.
+     */
     public CashierDashboardView(User cashier, MedicineService medicineService, SalesService salesService,
                                  com.zugobite.pims.services.DashboardService dashboardService, Runnable onLogout) {
         super("HealthFirst PIMS - Cashier POS (" + cashier.getFullName() + ")");

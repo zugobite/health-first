@@ -18,6 +18,11 @@ public class User {
     private final Role role;
     private final String fullName;
 
+    /**
+     * Builds the post-auth identity used across the session (no password).
+     * Typically produced by {@link com.zugobite.pims.services.UserService#authenticate}
+     * or {@link com.zugobite.pims.services.UserService#getCashiers}.
+     */
     public User(int userId, String username, Role role, String fullName) {
         this.userId = userId;
         this.username = username;

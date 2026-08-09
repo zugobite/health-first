@@ -44,6 +44,10 @@ public class ManageSuppliersPanel extends JPanel {
     };
     private final JTable table = new StripedTable(tableModel);
 
+    /**
+     * Admin suppliers CRUD UI (Refresh/Add/Edit/Delete + table). Calls
+     * {@link #loadSuppliers()} on construct so the table is populated immediately.
+     */
     public ManageSuppliersPanel(SupplierService supplierService) {
         this.supplierService = supplierService;
         setLayout(new BorderLayout());

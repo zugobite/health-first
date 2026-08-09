@@ -41,6 +41,11 @@ public class StockCheckPanel extends JPanel {
     };
     private final JTable table = new StripedTable(tableModel);
 
+    /**
+     * Read-only stock lookup UI for cashiers: name field, Search button, and results table.
+     * Search delegates to {@link MedicineService#searchByName}; the table stays empty until
+     * Search is clicked. No cart or inventory side effects.
+     */
     public StockCheckPanel(MedicineService medicineService) {
         this.medicineService = medicineService;
         setLayout(new BorderLayout());

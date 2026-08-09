@@ -54,6 +54,10 @@ public class StripedTable extends JTable {
 
     private RowAccent rowAccent;
 
+    /**
+     * Applies project table defaults: row height 28, no grid, fill viewport, no column
+     * reorder, left-aligned headers, and a {@link BigDecimal} money renderer.
+     */
     public StripedTable(TableModel model) {
         super(model);
         setRowHeight(28);
@@ -77,6 +81,10 @@ public class StripedTable extends JTable {
         repaint();
     }
 
+    /**
+     * Left-aligns label cells; for unselected rows applies {@link RowAccent} (model index)
+     * or zebra striping. Selection highlight is never overridden.
+     */
     @Override
     public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
         Component component = super.prepareRenderer(renderer, row, column);

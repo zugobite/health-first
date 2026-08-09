@@ -21,6 +21,10 @@ public class Supplier {
     private String email;
     private String address;
 
+    /**
+     * Builds a supplier from a {@code suppliers} row (or from form fields before insert).
+     * On insert, {@code supplierId} is ignored - MySQL assigns it via AUTO_INCREMENT.
+     */
     public Supplier(int supplierId, String name, String contactPerson, String phone, String email, String address) {
         this.supplierId = supplierId;
         this.name = name;
