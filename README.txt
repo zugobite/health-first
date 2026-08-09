@@ -40,10 +40,10 @@ why that is an intentional, documented decision for this assignment).
 
     - Java Runtime Environment (JRE) 17 or higher
     - MySQL 8.0 or higher, running locally
-    - The bundled executable already includes the required libraries
-      (MySQL JDBC driver, Apache PDFBox, Apache POI, FlatLaf). If running
-      from source instead, see README.md for the full dependency list and
-      download commands.
+    - The submission bundle already includes the required libraries under
+      lib/ (MySQL JDBC driver, Apache PDFBox, Apache POI, FlatLaf). If
+      running from a source checkout instead, see README.md for the full
+      dependency list and download commands.
 
 
 --------------------------------------------------------------------------------
@@ -71,15 +71,21 @@ why that is an intentional, documented decision for this assignment).
        (URL, USER, PASSWORD constants near the top of the file), then
        recompile if running from source.
 
-    4. Launch the application:
+    4. Launch the application (Java 17+ must be installed):
 
-           zasciahugo_pims.exe        (bundled executable)
+           Windows : double-click run.bat
+                     (or zasciahugo_pims.exe if you have the Launch4j
+                     wrapper built - same jar underneath)
 
-       or, running from source:
+           macOS / Linux :
+                     ./run.sh
 
-           java -cp "out:<jar-list>" com.zugobite.pims.Main
+       Both launchers run zasciahugo_pims.jar with the bundled lib/
+       jars on the classpath. You still need a local MySQL instance
+       loaded from database.sql (step 2) - the database is not embedded.
 
-       (see README.md for the full classpath).
+       Running from a fresh source checkout instead: see README.md for
+       the full javac/java classpath commands.
 
 
 --------------------------------------------------------------------------------

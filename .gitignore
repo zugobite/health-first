@@ -34,3 +34,10 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local packaging / submission bundle (generated)
+dist/
+dist-mac/
+dist-win/
+tools/
+*.zip
